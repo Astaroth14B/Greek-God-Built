@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  Animated, Platform,
+  Animated, Image,
 } from 'react-native';
 import { Colors, FontSizes, Spacing, Radii, Shadows } from '../theme';
 import useAppStore from '../store/useAppStore';
@@ -18,9 +18,8 @@ export default function HomeScreen({ navigation }) {
   const [isPedometerAvailable, setIsPedometerAvailable] = useState(false);
 
   useEffect(() => {
-    Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true }).start();
+    Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }).start();
 
-    // Try real pedometer, fall back to mock incrementing counter
     let mockInterval;
     Pedometer.isAvailableAsync().then((available) => {
       setIsPedometerAvailable(available);
@@ -32,13 +31,11 @@ export default function HomeScreen({ navigation }) {
           .then((res) => setStepCount(res.steps))
           .catch(() => {});
       } else {
-        // MOCK: Simulate step count incrementing
         mockInterval = setInterval(() => {
           incrementSteps(Math.floor(Math.random() * 8) + 1);
         }, 4000);
       }
     }).catch(() => {
-      // MOCK fallback
       mockInterval = setInterval(() => {
         incrementSteps(Math.floor(Math.random() * 8) + 1);
       }, 4000);
@@ -48,9 +45,8 @@ export default function HomeScreen({ navigation }) {
   }, []);
 
   const stepProgress = Math.min(stepCount / 10000, 1);
-  const goalColor = { bulk: Colors.green, cut: Colors.orange, maintain: Colors.accent }[profile.goal] || Colors.accent;
 
-  const QuickAction = ({ icon, label, color, onPress, iconLib = 'Ionicons' }) => {
+  const QuickAction = ({ icon, label, sublabel, color, onPress, iconLib = 'Ionicons' }) => {
     const scaleAnim = useRef(new Animated.Value(1)).current;
     const handlePress = () => {
       Animated.sequence([
@@ -62,14 +58,15 @@ export default function HomeScreen({ navigation }) {
     return (
       <Animated.View style={{ flex: 1, transform: [{ scale: scaleAnim }] }}>
         <TouchableOpacity
-          style={[styles.quickAction, { borderColor: color + '44', backgroundColor: color + '12' }]}
+          style={[styles.quickAction, { borderColor: color + '55', backgroundColor: color + '10' }]}
           onPress={handlePress}
           activeOpacity={0.8}
         >
-          <View style={[styles.qaIcon, { backgroundColor: color + '22', borderColor: color + '44' }]}>
+          <View style={[styles.qaIcon, { backgroundColor: color + '20', borderColor: color + '60' }]}>
             <IconComp name={icon} size={22} color={color} />
           </View>
           <Text style={[styles.qaLabel, { color }]}>{label}</Text>
+          {sublabel && <Text style={styles.qaSub}>{sublabel}</Text>}
         </TouchableOpacity>
       </Animated.View>
     );
@@ -81,102 +78,146 @@ export default function HomeScreen({ navigation }) {
       contentContainerStyle={styles.scroll}
       showsVerticalScrollIndicator={false}
     >
-      {/* Header */}
+      {/* Divine Header with Greek God Logo */}
       <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>Good morning,</Text>
-          <Text style={styles.name}>{profile.name || 'Champion'} ⚡</Text>
+        <View style={styles.headerUserRow}>
+          <View style={styles.avatarBorder}>
+            <Image
+              source={require('../../assets/logo.png')}
+              style={styles.avatarImage}
+              resizeMode="contain"
+            />
+          </View>
+          <View style={styles.headerTextCol}>
+            <View style={styles.demigodPill}>
+              <Text style={styles.demigodText}>⚡ OLYMPIAN PROTOCOL</Text>
+            </View>
+            <Text style={styles.name}>{profile.name || 'Demi-God'} 🔱</Text>
+          </View>
         </View>
-        <View style={[styles.streakBadge, Shadows.green]}>
+
+        <View style={[styles.streakBadge, Shadows.gold]}>
           <Text style={styles.streakFire}>🔥</Text>
           <Text style={styles.streakCount}>{streak}</Text>
-          <Text style={styles.streakLabel}>day{streak !== 1 ? 's' : ''}</Text>
+          <Text style={styles.streakLabel}>Day Streak</Text>
         </View>
       </View>
 
-      {/* Calorie Ring */}
+      {/* Calorie Ring Card */}
       <Card style={styles.ringCard}>
+        <View style={styles.ringHeader}>
+          <Text style={styles.cardHeaderTitle}>DAILY ENERGY CONSUMPTION</Text>
+          <View style={styles.goldStatusDot} />
+        </View>
         <View style={styles.ringRow}>
-          <CalorieRing consumed={consumed.calories} target={nutrition.targetCalories} size={180} />
+          <CalorieRing consumed={consumed.calories} target={nutrition.targetCalories || 2200} size={175} />
           <View style={styles.ringStats}>
-            <Text style={styles.ringStatLabel}>Target</Text>
-            <Text style={styles.ringStatValue}>{nutrition.targetCalories}</Text>
-            <Text style={styles.ringStatUnit}>kcal</Text>
+            <Text style={styles.ringStatLabel}>TARGET</Text>
+            <Text style={[styles.ringStatValue, { color: Colors.gold }]}>{nutrition.targetCalories || 2200}</Text>
+            <Text style={styles.ringStatUnit}>kcal/day</Text>
             <View style={styles.ringSep} />
-            <Text style={styles.ringStatLabel}>Burned</Text>
+            <Text style={styles.ringStatLabel}>BURNED</Text>
             <Text style={[styles.ringStatValue, { color: Colors.orange }]}>
-              {Math.round(nutrition.targetCalories * 0.15)}
+              {Math.round((nutrition.targetCalories || 2200) * 0.18)}
             </Text>
-            <Text style={styles.ringStatUnit}>kcal</Text>
+            <Text style={styles.ringStatUnit}>kcal active</Text>
           </View>
         </View>
       </Card>
 
-      {/* Macros */}
+      {/* Macros Card */}
       <Card style={styles.macrosCard}>
-        <Text style={styles.cardTitle}>Macronutrients</Text>
+        <View style={styles.macroHeaderRow}>
+          <Text style={styles.cardHeaderTitle}>OLYMPIAN MACROS</Text>
+          <Text style={styles.macroSub}>Target Goals</Text>
+        </View>
         <MacroBar
-          label="Protein"
+          label="Protein (Muscle Synthesis)"
           consumed={consumed.protein}
-          target={nutrition.macros?.protein || 150}
+          target={nutrition.macros?.protein || 160}
           color={Colors.accent}
         />
         <MacroBar
-          label="Carbs"
+          label="Carbohydrates (Titan Energy)"
           consumed={consumed.carbs}
-          target={nutrition.macros?.carbs || 200}
+          target={nutrition.macros?.carbs || 220}
           color={Colors.purple}
         />
         <MacroBar
-          label="Fat"
+          label="Healthy Fats (Hormone Health)"
           consumed={consumed.fat}
-          target={nutrition.macros?.fat || 65}
-          color={Colors.orange}
+          target={nutrition.macros?.fat || 70}
+          color={Colors.gold}
         />
       </Card>
 
-      {/* Steps + Streak Row */}
+      {/* Steps + Streak Widgets */}
       <View style={styles.widgetRow}>
-        {/* Steps */}
-        <Card style={styles.widget}>
+        <Card style={[styles.widget, { borderColor: Colors.green + '40' }]}>
           <View style={styles.widgetHeader}>
             <Ionicons name="footsteps" size={18} color={Colors.green} />
-            <Text style={styles.widgetTitle}>Steps</Text>
+            <Text style={styles.widgetTitle}>March Steps</Text>
           </View>
           <Text style={[styles.widgetValue, { color: Colors.green }]}>{stepCount.toLocaleString()}</Text>
-          <Text style={styles.widgetSub}>/ 10,000 goal</Text>
+          <Text style={styles.widgetSub}>/ 10,000 Spartan Goal</Text>
           <View style={styles.stepTrack}>
             <View style={[styles.stepFill, { width: `${stepProgress * 100}%` }]} />
           </View>
           {!isPedometerAvailable && (
-            <Text style={styles.mockBadge}>SIMULATED</Text>
+            <Text style={styles.mockBadge}>SIMULATED SENSOR</Text>
           )}
         </Card>
 
-        {/* Streak */}
-        <Card style={[styles.widget, { borderColor: Colors.orange + '44' }]}>
+        <Card style={[styles.widget, { borderColor: Colors.gold + '40' }]}>
           <View style={styles.widgetHeader}>
-            <Text style={{ fontSize: 18 }}>🔥</Text>
-            <Text style={styles.widgetTitle}>Streak</Text>
+            <Text style={{ fontSize: 18 }}>🏆</Text>
+            <Text style={styles.widgetTitle}>Divine Rank</Text>
           </View>
-          <Text style={[styles.widgetValue, { color: Colors.orange }]}>{streak}</Text>
-          <Text style={styles.widgetSub}>days active</Text>
-          <Text style={styles.streakMsg}>
-            {streak >= 7 ? '🏆 On fire! Keep it up!' : '💪 Keep going!'}
-          </Text>
+          <Text style={[styles.widgetValue, { color: Colors.gold }]}>Spartan</Text>
+          <Text style={styles.widgetSub}>Next: Titan at 14 days</Text>
+          <View style={styles.rankTrack}>
+            <View style={[styles.rankFill, { width: `${Math.min((streak / 14) * 100, 100)}%` }]} />
+          </View>
+          <Text style={styles.mockBadge}>RANK PROGRESS</Text>
         </Card>
       </View>
 
-      {/* Today's log summary */}
+      {/* Quick Actions */}
+      <Text style={styles.sectionTitle}>COMMAND CENTER</Text>
+      <View style={styles.quickRow}>
+        <QuickAction
+          icon="camera"
+          label="Scan Meal"
+          sublabel="Vision AI"
+          color={Colors.accent}
+          onPress={() => navigation.navigate('LogTab')}
+        />
+        <QuickAction
+          icon="barbell"
+          label="Track Form"
+          sublabel="Pose AI"
+          color={Colors.gold}
+          onPress={() => navigation.navigate('WorkoutTab')}
+        />
+        <QuickAction
+          icon="people"
+          label="Book Pro"
+          sublabel="Masters"
+          color={Colors.green}
+          onPress={() => navigation.navigate('ProsTab')}
+        />
+      </View>
+
+      {/* Today's Food Log */}
       <Card style={styles.logSummary}>
         <View style={styles.logHeader}>
-          <Text style={styles.cardTitle}>Today's Log</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Log')}>
-            <Text style={styles.viewAll}>View all →</Text>
+          <Text style={styles.cardHeaderTitle}>TODAY'S FUEL LOG</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('LogTab')}>
+            <Text style={styles.viewAll}>Full Log →</Text>
           </TouchableOpacity>
         </View>
         {dailyLog.length === 0 ? (
-          <Text style={styles.emptyLog}>No meals logged yet. Add your first meal! 🍽️</Text>
+          <Text style={styles.emptyLog}>No meals logged yet today. Scan your first meal! ⚡</Text>
         ) : (
           dailyLog.slice(-3).map((entry) => (
             <View key={entry.id} style={styles.logItem}>
@@ -192,105 +233,139 @@ export default function HomeScreen({ navigation }) {
           ))
         )}
       </Card>
-
-      {/* Quick Actions */}
-      <Text style={styles.sectionTitle}>Quick Actions</Text>
-      <View style={styles.quickRow}>
-        <QuickAction
-          icon="camera"
-          label="Log Meal"
-          color={Colors.accent}
-          onPress={() => navigation.navigate('Log')}
-        />
-        <QuickAction
-          icon="barbell"
-          label="Workout"
-          color={Colors.green}
-          onPress={() => navigation.navigate('Workout')}
-        />
-        <QuickAction
-          icon="people"
-          label="Find Pro"
-          color={Colors.purple}
-          onPress={() => navigation.navigate('Pros')}
-        />
-      </View>
     </Animated.ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.bg },
-  scroll: { paddingHorizontal: Spacing.md, paddingTop: 60, paddingBottom: 40 },
+  scroll: { paddingHorizontal: Spacing.md, paddingTop: 56, paddingBottom: 36 },
 
   header: {
     flexDirection: 'row', justifyContent: 'space-between',
-    alignItems: 'flex-start', marginBottom: Spacing.lg,
+    alignItems: 'center', marginBottom: Spacing.md,
   },
-  greeting: { fontSize: FontSizes.md, color: Colors.textSecondary },
-  name: { fontSize: FontSizes.xxl, fontWeight: '800', color: Colors.textPrimary },
+  headerUserRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 12,
+  },
+  avatarBorder: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    borderWidth: 2,
+    borderColor: Colors.gold,
+    overflow: 'hidden',
+    backgroundColor: '#000',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: Colors.gold,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  avatarImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+  },
+  headerTextCol: {
+    justifyContent: 'center',
+  },
+  demigodPill: {
+    backgroundColor: 'rgba(255, 215, 0, 0.12)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: Radii.full,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 215, 0, 0.3)',
+    alignSelf: 'flex-start',
+    marginBottom: 2,
+  },
+  demigodText: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: Colors.gold,
+    letterSpacing: 1,
+  },
+  name: { fontSize: FontSizes.xl, fontWeight: '900', color: Colors.textPrimary },
 
   streakBadge: {
     alignItems: 'center', backgroundColor: Colors.bgCard,
-    borderRadius: Radii.lg, paddingHorizontal: 14, paddingVertical: 10,
-    borderWidth: 1, borderColor: Colors.orange + '44',
+    borderRadius: Radii.md, paddingHorizontal: 12, paddingVertical: 8,
+    borderWidth: 1.5, borderColor: Colors.gold + '60',
   },
-  streakFire: { fontSize: 22 },
-  streakCount: { fontSize: FontSizes.xl, fontWeight: '900', color: Colors.orange },
-  streakLabel: { fontSize: FontSizes.xs, color: Colors.textMuted },
+  streakFire: { fontSize: 18 },
+  streakCount: { fontSize: FontSizes.lg, fontWeight: '900', color: Colors.gold },
+  streakLabel: { fontSize: 9, color: Colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5 },
 
-  ringCard: { marginBottom: Spacing.md },
+  ringCard: { marginBottom: Spacing.md, borderWidth: 1, borderColor: Colors.borderGold },
+  ringHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  cardHeaderTitle: {
+    fontSize: FontSizes.xs, fontWeight: '800', color: Colors.textSecondary,
+    letterSpacing: 1.2, textTransform: 'uppercase',
+  },
+  goldStatusDot: {
+    width: 8, height: 8, borderRadius: 4,
+    backgroundColor: Colors.gold,
+  },
   ringRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around' },
   ringStats: { alignItems: 'center' },
-  ringStatLabel: { fontSize: FontSizes.xs, color: Colors.textMuted, textTransform: 'uppercase', letterSpacing: 0.8 },
-  ringStatValue: { fontSize: FontSizes.xxl, fontWeight: '800', color: Colors.textPrimary, marginTop: 2 },
-  ringStatUnit: { fontSize: FontSizes.xs, color: Colors.textMuted },
+  ringStatLabel: { fontSize: 10, color: Colors.textMuted, textTransform: 'uppercase', letterSpacing: 1 },
+  ringStatValue: { fontSize: FontSizes.xxl, fontWeight: '900', marginTop: 2 },
+  ringStatUnit: { fontSize: 10, color: Colors.textMuted },
   ringSep: { width: 30, height: 1, backgroundColor: Colors.border, marginVertical: 8 },
 
   macrosCard: { marginBottom: Spacing.md },
-  cardTitle: { fontSize: FontSizes.md, fontWeight: '700', color: Colors.textPrimary, marginBottom: 12 },
+  macroHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  macroSub: { fontSize: FontSizes.xs, color: Colors.textMuted },
 
   widgetRow: { flexDirection: 'row', gap: 12, marginBottom: Spacing.md },
   widget: { flex: 1 },
   widgetHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 },
-  widgetTitle: { fontSize: FontSizes.sm, color: Colors.textSecondary, fontWeight: '600' },
-  widgetValue: { fontSize: FontSizes.xxxl, fontWeight: '900' },
+  widgetTitle: { fontSize: FontSizes.xs, color: Colors.textSecondary, fontWeight: '700', textTransform: 'uppercase' },
+  widgetValue: { fontSize: FontSizes.xxl, fontWeight: '900' },
   widgetSub: { fontSize: FontSizes.xs, color: Colors.textMuted, marginTop: 2 },
   stepTrack: {
     height: 4, backgroundColor: Colors.bgElevated,
     borderRadius: Radii.full, marginTop: 8, overflow: 'hidden',
   },
   stepFill: { height: '100%', backgroundColor: Colors.green, borderRadius: Radii.full },
-  mockBadge: {
-    fontSize: 8, color: Colors.textMuted, letterSpacing: 1,
-    textTransform: 'uppercase', marginTop: 4,
+  rankTrack: {
+    height: 4, backgroundColor: Colors.bgElevated,
+    borderRadius: Radii.full, marginTop: 8, overflow: 'hidden',
   },
-  streakMsg: { fontSize: FontSizes.xs, color: Colors.textSecondary, marginTop: 4 },
+  rankFill: { height: '100%', backgroundColor: Colors.gold, borderRadius: Radii.full },
+  mockBadge: {
+    fontSize: 8, color: Colors.textMuted, letterSpacing: 0.8,
+    textTransform: 'uppercase', marginTop: 5,
+  },
+
+  sectionTitle: {
+    fontSize: FontSizes.xs, fontWeight: '800', color: Colors.textSecondary,
+    textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 10,
+  },
+  quickRow: { flexDirection: 'row', gap: 10, marginBottom: Spacing.md },
+  quickAction: {
+    borderRadius: Radii.md, padding: 12, alignItems: 'center',
+    borderWidth: 1.5,
+  },
+  qaIcon: {
+    width: 42, height: 42, borderRadius: 21,
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: 6, borderWidth: 1,
+  },
+  qaLabel: { fontSize: FontSizes.xs, fontWeight: '800', textAlign: 'center' },
+  qaSub: { fontSize: 9, color: Colors.textMuted, marginTop: 1 },
 
   logSummary: { marginBottom: Spacing.md },
   logHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-  viewAll: { fontSize: FontSizes.sm, color: Colors.accent, fontWeight: '600' },
+  viewAll: { fontSize: FontSizes.xs, color: Colors.accent, fontWeight: '700', letterSpacing: 0.5 },
   emptyLog: { fontSize: FontSizes.sm, color: Colors.textMuted, fontStyle: 'italic' },
   logItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, borderTopWidth: 1, borderTopColor: Colors.border },
   logEmoji: { fontSize: 22, marginRight: 12 },
   logItemInfo: { flex: 1 },
-  logItemName: { fontSize: FontSizes.md, color: Colors.textPrimary, fontWeight: '600' },
-  logItemMacros: { fontSize: FontSizes.xs, color: Colors.textMuted, marginTop: 2 },
-  logItemCals: { fontSize: FontSizes.md, fontWeight: '700', color: Colors.accent },
-
-  sectionTitle: {
-    fontSize: FontSizes.sm, fontWeight: '700', color: Colors.textSecondary,
-    textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10,
-  },
-  quickRow: { flexDirection: 'row', gap: 10, marginBottom: Spacing.lg },
-  quickAction: {
-    borderRadius: Radii.md, padding: 14, alignItems: 'center',
-    borderWidth: 1.5,
-  },
-  qaIcon: {
-    width: 44, height: 44, borderRadius: 22,
-    alignItems: 'center', justifyContent: 'center',
-    marginBottom: 8, borderWidth: 1,
-  },
-  qaLabel: { fontSize: FontSizes.xs, fontWeight: '700', textAlign: 'center' },
+  logItemName: { fontSize: FontSizes.sm, color: Colors.textPrimary, fontWeight: '700' },
+  logItemMacros: { fontSize: 10, color: Colors.textMuted, marginTop: 2 },
+  logItemCals: { fontSize: FontSizes.sm, fontWeight: '800', color: Colors.gold },
 });

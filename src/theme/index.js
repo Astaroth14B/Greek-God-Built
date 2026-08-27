@@ -1,42 +1,52 @@
-// Greek God Build — Design Tokens
+// Greek God Build — Mythic Divine Design Tokens
 export const Colors = {
-  // Backgrounds
-  bg: '#0A0A0F',
-  bgCard: '#12121A',
-  bgElevated: '#1A1A26',
-  bgInput: '#1E1E2E',
+  // Mythic Dark Obsidian Backgrounds
+  bg: '#08080C',
+  bgCard: '#11111B',
+  bgElevated: '#1A1A28',
+  bgInput: '#161624',
 
-  // Accent — Electric Blue
-  accent: '#00D4FF',
-  accentDim: '#0099BB',
-  accentGlow: 'rgba(0, 212, 255, 0.15)',
+  // Olympian Gold Accent
+  gold: '#FFD700',
+  goldDim: '#D4AF37',
+  goldGlow: 'rgba(255, 215, 0, 0.2)',
+  goldLight: '#FFF3B0',
 
-  // Secondary — Lime green for success/streaks
-  green: '#39FF14',
-  greenDim: '#27B80E',
+  // Lightning Cyan / Electric Blue (Zeus Thunderbolt)
+  accent: '#00E5FF',
+  accentDim: '#00B4D8',
+  accentGlow: 'rgba(0, 229, 255, 0.22)',
+  accentDeep: '#0077B6',
 
-  // Warning / fat
-  orange: '#FF6B35',
-  orangeDim: '#CC5528',
+  // Spartan Laurel Green (for Vitality, Streaks, Success)
+  green: '#00E676',
+  greenDim: '#00C853',
+  greenGlow: 'rgba(0, 230, 118, 0.2)',
 
-  // Carbs
-  purple: '#A855F7',
-  purpleDim: '#7C3AED',
+  // Apollo Solar Orange / Fire
+  orange: '#FF6D00',
+  orangeDim: '#E65100',
+  orangeGlow: 'rgba(255, 109, 0, 0.2)',
 
-  // Text
+  // Ares Royal Purple / Carbs
+  purple: '#B388FF',
+  purpleDim: '#7C4DFF',
+
+  // Marble & Titanium Texts
   textPrimary: '#FFFFFF',
-  textSecondary: '#9CA3AF',
-  textMuted: '#4B5563',
+  textSecondary: '#A0AAB8',
+  textMuted: '#525B6C',
 
-  // Borders
-  border: 'rgba(255,255,255,0.08)',
-  borderAccent: 'rgba(0, 212, 255, 0.3)',
+  // Divine Borders
+  border: 'rgba(255, 255, 255, 0.1)',
+  borderGold: 'rgba(255, 215, 0, 0.35)',
+  borderAccent: 'rgba(0, 229, 255, 0.35)',
 
   // Danger
-  danger: '#FF4444',
+  danger: '#FF3B30',
 
   // Tab bar
-  tabBar: '#0E0E18',
+  tabBar: '#0A0A12',
 };
 
 export const FontSizes = {
@@ -47,7 +57,7 @@ export const FontSizes = {
   xl: 20,
   xxl: 26,
   xxxl: 34,
-  display: 48,
+  display: 44,
 };
 
 export const Spacing = {
@@ -70,22 +80,29 @@ export const Radii = {
 export const Shadows = {
   card: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.6,
+    shadowRadius: 14,
     elevation: 8,
   },
   accent: {
-    shadowColor: '#00D4FF',
+    shadowColor: '#00E5FF',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
+    shadowOpacity: 0.5,
+    shadowRadius: 18,
     elevation: 12,
   },
-  green: {
-    shadowColor: '#39FF14',
+  gold: {
+    shadowColor: '#FFD700',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.55,
+    shadowRadius: 20,
+    elevation: 14,
+  },
+  green: {
+    shadowColor: '#00E676',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
     shadowRadius: 16,
     elevation: 12,
   },
