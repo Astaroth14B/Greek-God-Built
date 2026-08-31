@@ -41,12 +41,25 @@ const QuickAction = ({ icon, label, sublabel, onPress }) => {
 };
 
 export default function HomeScreen({ navigation }) {
-  const { profile, nutrition, streak, stepCount, setStepCount, incrementSteps, getConsumed, dailyLog } = useAppStore();
+  const {
+    profile,
+    nutrition,
+    streak,
+    stepCount,
+    setStepCount,
+    incrementSteps,
+    getConsumed,
+    dailyLog,
+    checkDailyLoginStreak,
+  } = useAppStore();
   const consumed = getConsumed();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [isPedometerAvailable, setIsPedometerAvailable] = useState(false);
 
   useEffect(() => {
+    // Check and update daily login streak
+    checkDailyLoginStreak();
+
     Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true }).start();
 
     let mockInterval;
@@ -93,9 +106,13 @@ export default function HomeScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
         nestedScrollEnabled
       >
-        {/* Header with Pop-Out Logo */}
+        {/* Header with Clickable Pop-Out Logo & Profile */}
         <View style={styles.header}>
-          <View style={styles.headerUserRow}>
+          <TouchableOpacity
+            style={styles.headerUserRow}
+            onPress={() => navigation.navigate('UserProfile')}
+            activeOpacity={0.8}
+          >
             {/* Elevated Gold-Popping Logo */}
             <View style={styles.avatarPopContainer}>
               <View style={styles.avatarGlowRing} />
@@ -111,16 +128,21 @@ export default function HomeScreen({ navigation }) {
             <View style={styles.headerTextCol}>
               <View style={styles.protocolBadge}>
                 <Text style={styles.protocolText}>PROJECT ZEUS</Text>
+                <Ionicons name="chevron-forward" size={10} color={Colors.gold} />
               </View>
               <Text style={styles.name}>{profile.name || 'Athlete'}</Text>
             </View>
-          </View>
+          </TouchableOpacity>
 
-          <View style={styles.streakBadge}>
+          <TouchableOpacity
+            style={styles.streakBadge}
+            onPress={() => navigation.navigate('UserProfile')}
+            activeOpacity={0.8}
+          >
             <Ionicons name="flame" size={18} color={Colors.gold} />
             <Text style={styles.streakCount}>{streak}</Text>
             <Text style={styles.streakLabel}>Day Streak</Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/* Calorie Ring Card */}

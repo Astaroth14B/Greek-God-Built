@@ -17,6 +17,7 @@ import WorkoutCameraScreen from '../screens/WorkoutCameraScreen';
 import WorkoutSummaryScreen from '../screens/WorkoutSummaryScreen';
 import BookingScreen from '../screens/BookingScreen';
 import ConfirmationScreen from '../screens/ConfirmationScreen';
+import UserProfileScreen from '../screens/UserProfileScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -79,6 +80,11 @@ function AppNavigator() {
             <Stack.Screen
               name="Confirmation"
               component={ConfirmationScreen}
+              options={{ presentation: 'card' }}
+            />
+            <Stack.Screen
+              name="UserProfile"
+              component={UserProfileScreen}
               options={{ presentation: 'card' }}
             />
           </>
