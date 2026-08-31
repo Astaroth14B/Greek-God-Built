@@ -32,7 +32,11 @@ export default function WorkoutScreen({ navigation }) {
 
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+        nestedScrollEnabled
+      >
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>AI Form Tracking</Text>
@@ -123,7 +127,7 @@ export default function WorkoutScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.bg },
-  scroll: { padding: Spacing.md, paddingTop: 60, paddingBottom: 40 },
+  scroll: { padding: Spacing.md, paddingTop: 60, paddingBottom: 32 },
 
   header: { marginBottom: Spacing.lg },
   title: { fontSize: FontSizes.xxl, fontWeight: '800', color: Colors.textPrimary },

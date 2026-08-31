@@ -91,6 +91,7 @@ export default function HomeScreen({ navigation }) {
         style={[styles.container, { opacity: fadeAnim }]}
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
+        nestedScrollEnabled
       >
         {/* Header with Pop-Out Logo */}
         <View style={styles.header}>
@@ -282,7 +283,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(10, 10, 13, 0.85)',
   },
   container: { flex: 1, backgroundColor: 'transparent' },
-  scroll: { paddingHorizontal: Spacing.md, paddingTop: 56, paddingBottom: 36 },
+  scroll: { paddingHorizontal: Spacing.md, paddingTop: 56, paddingBottom: 32 },
 
   header: {
     flexDirection: 'row', justifyContent: 'space-between',

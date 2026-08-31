@@ -84,7 +84,7 @@ export default function WelcomeScreen({ navigation }) {
         {/* CTA */}
         <TouchableOpacity
           style={styles.ctaButton}
-          onPress={() => navigation.navigate('PersonalInfo')}
+          onPress={() => navigation.navigate('OnboardingPager')}
           activeOpacity={0.88}
         >
           <Text style={styles.ctaText}>START ASSESSMENT</Text>

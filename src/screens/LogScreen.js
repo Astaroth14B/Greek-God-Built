@@ -26,7 +26,11 @@ export default function LogScreen({ navigation }) {
 
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+        nestedScrollEnabled
+      >
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Food Intake Log</Text>
@@ -129,7 +133,7 @@ export default function LogScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.bg },
-  scroll: { padding: Spacing.md, paddingTop: 60, paddingBottom: 40 },
+  scroll: { padding: Spacing.md, paddingTop: 60, paddingBottom: 32 },
 
   header: { marginBottom: Spacing.md },
   title: { fontSize: FontSizes.xxl, fontWeight: '800', color: Colors.textPrimary },

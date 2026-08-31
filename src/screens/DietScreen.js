@@ -37,7 +37,12 @@ export default function DietScreen() {
   const totalF = MEAL_SLOTS.reduce((sum, slot) => sum + (plan[slot.key]?.fat || 0), 0);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.scroll}
+      showsVerticalScrollIndicator={false}
+      nestedScrollEnabled
+    >
       {/* Header */}
       <View style={styles.header}>
         <View>
@@ -173,7 +178,7 @@ export default function DietScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.bg },
-  scroll: { padding: Spacing.md, paddingTop: 60, paddingBottom: 40 },
+  scroll: { padding: Spacing.md, paddingTop: 60, paddingBottom: 32 },
 
   header: { marginBottom: Spacing.md },
   title: { fontSize: FontSizes.xxl, fontWeight: '800', color: Colors.textPrimary },
