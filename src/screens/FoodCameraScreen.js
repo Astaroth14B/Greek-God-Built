@@ -7,7 +7,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Colors, FontSizes, Spacing, Radii, Shadows } from '../theme';
 import { Ionicons } from '@expo/vector-icons';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 export default function FoodCameraScreen({ navigation }) {
   const [permission, requestPermission] = useCameraPermissions();
@@ -19,15 +19,13 @@ export default function FoodCameraScreen({ navigation }) {
   const scanLineAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Pulse animation for capture button
     Animated.loop(
       Animated.sequence([
-        Animated.timing(pulseAnim, { toValue: 1.1, duration: 800, useNativeDriver: true }),
-        Animated.timing(pulseAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 1.06, duration: 900, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 1, duration: 900, useNativeDriver: true }),
       ])
     ).start();
 
-    // Scan line animation
     Animated.loop(
       Animated.timing(scanLineAnim, { toValue: 1, duration: 2000, useNativeDriver: true })
     ).start();
@@ -38,16 +36,18 @@ export default function FoodCameraScreen({ navigation }) {
   if (!permission.granted) {
     return (
       <View style={styles.permContainer}>
-        <Text style={styles.permEmoji}>📷</Text>
-        <Text style={styles.permTitle}>Camera Access Needed</Text>
+        <View style={styles.permIconContainer}>
+          <Ionicons name="camera-outline" size={32} color={Colors.gold} />
+        </View>
+        <Text style={styles.permTitle}>Camera Permission Needed</Text>
         <Text style={styles.permDesc}>
-          We need camera access to analyze your food and estimate calories.
+          Allow camera access to analyze meal portions and estimate caloric content.
         </Text>
-        <TouchableOpacity style={styles.permBtn} onPress={requestPermission}>
-          <Text style={styles.permBtnText}>Grant Access</Text>
+        <TouchableOpacity style={styles.permBtn} onPress={requestPermission} activeOpacity={0.85}>
+          <Text style={styles.permBtnText}>Enable Camera</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Text style={styles.backBtnText}>← Go Back</Text>
+          <Text style={styles.backBtnText}>Return</Text>
         </TouchableOpacity>
       </View>
     );
@@ -65,10 +65,9 @@ export default function FoodCameraScreen({ navigation }) {
         photoUri = photo?.uri || null;
       }
     } catch (e) {
-      // Fallback for emulator / mock environments
+      // Fallback in dev/mock environments
     }
 
-    // Simulate 1.2s analysis delay for Vision AI experience
     setTimeout(() => {
       setAnalyzing(false);
       navigation.replace('FoodResult', { photoUri });
@@ -77,33 +76,32 @@ export default function FoodCameraScreen({ navigation }) {
 
   const scanLineY = scanLineAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 200],
+    outputRange: [0, FRAME_SIZE - 4],
   });
 
   return (
     <View style={styles.container}>
       <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing={facing}>
-        {/* Top overlay */}
+        {/* Top bar overlay */}
         <View style={styles.topOverlay}>
           <TouchableOpacity style={styles.closeBtn} onPress={() => navigation.goBack()}>
-            <Ionicons name="close" size={24} color={Colors.textPrimary} />
+            <Ionicons name="close" size={20} color={Colors.textPrimary} />
           </TouchableOpacity>
           <View style={styles.topBadge}>
-            <Ionicons name="flash" size={14} color={Colors.accent} />
-            <Text style={styles.topBadgeText}>AI Calorie Scanner</Text>
+            <Ionicons name="scan-outline" size={13} color={Colors.gold} />
+            <Text style={styles.topBadgeText}>AI NUTRITION SCANNER</Text>
           </View>
           <TouchableOpacity
             style={styles.flipBtn}
             onPress={() => setFacing(f => f === 'back' ? 'front' : 'back')}
           >
-            <Ionicons name="camera-reverse" size={24} color={Colors.textPrimary} />
+            <Ionicons name="camera-reverse-outline" size={20} color={Colors.textPrimary} />
           </TouchableOpacity>
         </View>
 
-        {/* Scan Frame */}
+        {/* Scan Reticle Frame */}
         {!analyzing && (
           <View style={styles.scanFrame}>
-            {/* Corner marks */}
             {[
               { top: 0, left: 0 },
               { top: 0, right: 0 },
@@ -112,26 +110,25 @@ export default function FoodCameraScreen({ navigation }) {
             ].map((pos, i) => (
               <View key={i} style={[styles.corner, pos]} />
             ))}
-            {/* Scan line */}
             <Animated.View
               style={[styles.scanLine, { transform: [{ translateY: scanLineY }] }]}
             />
-            <Text style={styles.scanHint}>Center your food in the frame</Text>
+            <Text style={styles.scanHint}>Align meal within the frame</Text>
           </View>
         )}
 
-        {/* Analyzing overlay */}
+        {/* Analyzing state overlay */}
         {analyzing && (
           <View style={styles.analyzingOverlay}>
-            <ActivityIndicator size="large" color={Colors.accent} />
-            <Text style={styles.analyzingText}>Analyzing food...</Text>
-            <Text style={styles.analyzingSubtext}>Identifying nutrition info</Text>
+            <ActivityIndicator size="large" color={Colors.gold} />
+            <Text style={styles.analyzingText}>Analyzing Nutritional Breakdown</Text>
+            <Text style={styles.analyzingSubtext}>Estimating macros & calories</Text>
           </View>
         )}
 
         {/* Bottom Controls */}
         <View style={styles.bottomControls}>
-          <Text style={styles.hint}>📸 Point at your meal and tap to analyze</Text>
+          <Text style={styles.hint}>Hold device steady and tap capture</Text>
           <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
             <TouchableOpacity
               style={[styles.captureBtn, analyzing && styles.captureBtnDisabled]}
@@ -141,14 +138,14 @@ export default function FoodCameraScreen({ navigation }) {
               <View style={styles.captureBtnInner} />
             </TouchableOpacity>
           </Animated.View>
-          <Text style={styles.mockNote}>MOCK • AI Result Simulated</Text>
+          <Text style={styles.mockNote}>COMPUTER VISION MODEL</Text>
         </View>
       </CameraView>
     </View>
   );
 }
 
-const FRAME_SIZE = width * 0.7;
+const FRAME_SIZE = width * 0.72;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
@@ -157,36 +154,40 @@ const styles = StyleSheet.create({
     flex: 1, backgroundColor: Colors.bg,
     alignItems: 'center', justifyContent: 'center', padding: Spacing.xl,
   },
-  permEmoji: { fontSize: 56, marginBottom: 16 },
-  permTitle: { fontSize: FontSizes.xxl, fontWeight: '800', color: Colors.textPrimary, marginBottom: 8, textAlign: 'center' },
-  permDesc: { fontSize: FontSizes.md, color: Colors.textSecondary, textAlign: 'center', lineHeight: 22, marginBottom: 24 },
-  permBtn: {
-    backgroundColor: Colors.accent, paddingVertical: 14, paddingHorizontal: 36,
-    borderRadius: Radii.full, marginBottom: 12, ...Shadows.accent,
+  permIconContainer: {
+    width: 64, height: 64, borderRadius: 32,
+    backgroundColor: Colors.goldGlow, borderWidth: 1, borderColor: Colors.borderGold,
+    alignItems: 'center', justifyContent: 'center', marginBottom: 16,
   },
-  permBtnText: { fontSize: FontSizes.md, fontWeight: '800', color: Colors.bg },
+  permTitle: { fontSize: FontSizes.xl, fontWeight: '800', color: Colors.textPrimary, marginBottom: 8, textAlign: 'center' },
+  permDesc: { fontSize: FontSizes.sm, color: Colors.textSecondary, textAlign: 'center', lineHeight: 20, marginBottom: 24 },
+  permBtn: {
+    backgroundColor: Colors.gold, paddingVertical: 14, paddingHorizontal: 36,
+    borderRadius: Radii.full, marginBottom: 12, ...Shadows.gold,
+  },
+  permBtnText: { fontSize: FontSizes.sm, fontWeight: '800', color: Colors.bg, letterSpacing: 0.5 },
   backBtn: { paddingVertical: 10 },
-  backBtnText: { fontSize: FontSizes.md, color: Colors.textSecondary },
+  backBtnText: { fontSize: FontSizes.xs, color: Colors.textSecondary },
 
   topOverlay: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 20, paddingTop: 60, paddingBottom: 20,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    paddingHorizontal: 20, paddingTop: 60, paddingBottom: 16,
+    backgroundColor: 'rgba(0,0,0,0.6)',
   },
   closeBtn: {
-    width: 40, height: 40, borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center',
+    width: 38, height: 38, borderRadius: 19,
+    backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center',
   },
   topBadge: {
-    flexDirection: 'row', alignItems: 'center', gap: 5,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    backgroundColor: 'rgba(10,10,13,0.85)',
     paddingHorizontal: 12, paddingVertical: 6, borderRadius: Radii.full,
-    borderWidth: 1, borderColor: Colors.borderAccent,
+    borderWidth: 1, borderColor: Colors.borderGold,
   },
-  topBadgeText: { fontSize: FontSizes.xs, color: Colors.accent, fontWeight: '700', letterSpacing: 0.5 },
+  topBadgeText: { fontSize: 10, color: Colors.gold, fontWeight: '800', letterSpacing: 1 },
   flipBtn: {
-    width: 40, height: 40, borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center',
+    width: 38, height: 38, borderRadius: 19,
+    backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center',
   },
 
   scanFrame: {
@@ -198,52 +199,51 @@ const styles = StyleSheet.create({
   },
   corner: {
     position: 'absolute',
-    width: 24, height: 24,
-    borderColor: Colors.accent, borderWidth: 3,
-    borderTopRightRadius: 0, borderBottomLeftRadius: 0,
+    width: 22, height: 22,
+    borderColor: Colors.gold, borderWidth: 2.5,
   },
   scanLine: {
     position: 'absolute',
     left: 0, right: 0, height: 2,
-    backgroundColor: Colors.accent, opacity: 0.8,
-    shadowColor: Colors.accent, shadowRadius: 8, shadowOpacity: 1,
+    backgroundColor: Colors.gold, opacity: 0.9,
   },
   scanHint: {
-    fontSize: FontSizes.xs, color: 'rgba(255,255,255,0.7)',
-    marginBottom: 12, fontWeight: '600', letterSpacing: 0.5,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    fontSize: 10, color: '#fff',
+    marginBottom: 12, fontWeight: '600', letterSpacing: 0.8,
+    backgroundColor: 'rgba(10,10,13,0.75)',
     paddingHorizontal: 10, paddingVertical: 4, borderRadius: Radii.full,
+    textTransform: 'uppercase',
   },
 
   analyzingOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    alignItems: 'center', justifyContent: 'center', gap: 12,
+    backgroundColor: 'rgba(10,10,13,0.85)',
+    alignItems: 'center', justifyContent: 'center', gap: 10,
   },
-  analyzingText: { fontSize: FontSizes.xl, fontWeight: '800', color: Colors.textPrimary },
-  analyzingSubtext: { fontSize: FontSizes.sm, color: Colors.accent },
+  analyzingText: { fontSize: FontSizes.lg, fontWeight: '800', color: Colors.textPrimary },
+  analyzingSubtext: { fontSize: FontSizes.xs, color: Colors.gold, letterSpacing: 0.5 },
 
   bottomControls: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
-    paddingBottom: 50, paddingTop: 20,
+    paddingBottom: 44, paddingTop: 16,
     backgroundColor: 'rgba(0,0,0,0.6)',
-    alignItems: 'center', gap: 16,
+    alignItems: 'center', gap: 14,
   },
-  hint: { fontSize: FontSizes.sm, color: 'rgba(255,255,255,0.8)' },
+  hint: { fontSize: FontSizes.xs, color: Colors.textSecondary },
   captureBtn: {
-    width: 80, height: 80, borderRadius: 40,
+    width: 72, height: 72, borderRadius: 36,
     backgroundColor: 'transparent',
-    borderWidth: 4, borderColor: Colors.accent,
+    borderWidth: 3, borderColor: Colors.gold,
     alignItems: 'center', justifyContent: 'center',
-    ...Shadows.accent,
+    ...Shadows.gold,
   },
   captureBtnDisabled: { borderColor: Colors.textMuted },
   captureBtnInner: {
-    width: 62, height: 62, borderRadius: 31,
-    backgroundColor: Colors.accent,
+    width: 56, height: 56, borderRadius: 28,
+    backgroundColor: Colors.gold,
   },
   mockNote: {
-    fontSize: 9, color: 'rgba(255,255,255,0.4)',
+    fontSize: 8, color: Colors.textMuted,
     letterSpacing: 1, textTransform: 'uppercase',
   },
 });

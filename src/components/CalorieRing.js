@@ -4,9 +4,9 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Colors, FontSizes } from '../theme';
 
 /**
- * SVG donut ring showing consumed vs target calories
+ * Clean Black, White & Gold circular calorie ring
  */
-const CalorieRing = ({ consumed = 0, target = 2000, size = 180, strokeWidth = 14 }) => {
+const CalorieRing = ({ consumed = 0, target = 2000, size = 175, strokeWidth = 12 }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const progress = target > 0 ? Math.min(consumed / target, 1) : 0;
@@ -29,12 +29,12 @@ const CalorieRing = ({ consumed = 0, target = 2000, size = 180, strokeWidth = 14
             strokeWidth={strokeWidth}
             fill="transparent"
           />
-          {/* Progress arc */}
+          {/* Progress arc in Olympian Gold */}
           <Circle
             cx={center}
             cy={center}
             r={radius}
-            stroke={isOver ? Colors.orange : Colors.accent}
+            stroke={isOver ? Colors.orange : Colors.gold}
             strokeWidth={strokeWidth}
             strokeDasharray={`${circumference} ${circumference}`}
             strokeDashoffset={strokeDashoffset}
@@ -49,7 +49,7 @@ const CalorieRing = ({ consumed = 0, target = 2000, size = 180, strokeWidth = 14
         <Text style={styles.unitText}>kcal eaten</Text>
         <View style={styles.divider} />
         <Text style={[styles.remainingText, isOver && styles.overText]}>
-          {isOver ? `${Math.round(consumed - target)} over` : `${Math.round(remaining)} left`}
+          {isOver ? `${Math.round(consumed - target)} over` : `${Math.round(remaining)} remaining`}
         </Text>
       </View>
     </View>
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.xxxl,
     fontWeight: '800',
     color: Colors.textPrimary,
-    letterSpacing: -1,
+    letterSpacing: -0.5,
   },
   unitText: {
     fontSize: FontSizes.xs,
@@ -80,15 +80,16 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   divider: {
-    width: 30,
+    width: 24,
     height: 1,
     backgroundColor: Colors.border,
-    marginVertical: 6,
+    marginVertical: 5,
   },
   remainingText: {
     fontSize: FontSizes.sm,
-    color: Colors.accent,
+    color: Colors.gold,
     fontWeight: '600',
+    letterSpacing: 0.2,
   },
   overText: {
     color: Colors.orange,

@@ -5,10 +5,11 @@ import {
 } from 'react-native';
 import { Colors, FontSizes, Spacing, Radii, Shadows } from '../../theme';
 import useAppStore from '../../store/useAppStore';
+import { Ionicons } from '@expo/vector-icons';
 
 const SEX_OPTIONS = [
-  { label: '♂ Male', value: 'male' },
-  { label: '♀ Female', value: 'female' },
+  { label: 'Male', value: 'male' },
+  { label: 'Female', value: 'female' },
 ];
 
 export default function PersonalInfoScreen({ navigation }) {
@@ -52,18 +53,18 @@ export default function PersonalInfoScreen({ navigation }) {
           <View style={styles.progressDot} />
         </View>
 
-        <Text style={styles.stepLabel}>Step 1 of 3</Text>
-        <Text style={styles.title}>Tell us about{'\n'}yourself</Text>
-        <Text style={styles.subtitle}>We'll personalize your plan based on this.</Text>
+        <Text style={styles.stepLabel}>STEP 1 OF 3</Text>
+        <Text style={styles.title}>Biometric Profile</Text>
+        <Text style={styles.subtitle}>Enter baseline metrics for basal metabolic calculation.</Text>
 
         {/* Name */}
         <View style={styles.field}>
-          <Text style={styles.fieldLabel}>Name</Text>
+          <Text style={styles.fieldLabel}>Athlete Name</Text>
           <TextInput
             style={styles.input}
             value={name}
             onChangeText={setName}
-            placeholder="Your first name"
+            placeholder="First name"
             placeholderTextColor={Colors.textMuted}
             autoCorrect={false}
           />
@@ -87,17 +88,21 @@ export default function PersonalInfoScreen({ navigation }) {
         <View style={styles.field}>
           <Text style={styles.fieldLabel}>Biological Sex</Text>
           <View style={styles.optionRow}>
-            {SEX_OPTIONS.map((opt) => (
-              <TouchableOpacity
-                key={opt.value}
-                style={[styles.optionBtn, sex === opt.value && styles.optionBtnActive]}
-                onPress={() => setSex(opt.value)}
-              >
-                <Text style={[styles.optionText, sex === opt.value && styles.optionTextActive]}>
-                  {opt.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            {SEX_OPTIONS.map((opt) => {
+              const isSelected = sex === opt.value;
+              return (
+                <TouchableOpacity
+                  key={opt.value}
+                  style={[styles.optionBtn, isSelected && styles.optionBtnActive]}
+                  onPress={() => setSex(opt.value)}
+                  activeOpacity={0.8}
+                >
+                  <Text style={[styles.optionText, isSelected && styles.optionTextActive]}>
+                    {opt.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
 
@@ -133,8 +138,12 @@ export default function PersonalInfoScreen({ navigation }) {
           style={[styles.nextBtn, !canContinue && styles.nextBtnDisabled]}
           onPress={handleContinue}
           disabled={!canContinue}
+          activeOpacity={0.85}
         >
-          <Text style={styles.nextBtnText}>Continue →</Text>
+          <Text style={[styles.nextBtnText, !canContinue && styles.nextBtnTextDisabled]}>
+            Next Step
+          </Text>
+          <Ionicons name="arrow-forward" size={16} color={canContinue ? Colors.bg : Colors.textMuted} />
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -143,60 +152,60 @@ export default function PersonalInfoScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.bg },
-  scroll: { padding: Spacing.lg, paddingTop: 60 },
+  scroll: { padding: Spacing.lg, paddingTop: 60, paddingBottom: 40 },
 
   progressRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.md,
   },
   progressDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
     backgroundColor: Colors.bgElevated,
     borderWidth: 1,
     borderColor: Colors.border,
   },
   progressActive: {
-    backgroundColor: Colors.accent,
-    borderColor: Colors.accent,
+    backgroundColor: Colors.gold,
+    borderColor: Colors.gold,
   },
   progressLine: {
     flex: 1,
-    height: 2,
+    height: 1.5,
     backgroundColor: Colors.border,
-    marginHorizontal: 4,
+    marginHorizontal: 6,
   },
 
   stepLabel: {
-    fontSize: FontSizes.xs,
-    color: Colors.accent,
-    fontWeight: '700',
+    fontSize: 10,
+    color: Colors.gold,
+    fontWeight: '800',
     letterSpacing: 1.5,
     textTransform: 'uppercase',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   title: {
-    fontSize: FontSizes.xxxl,
+    fontSize: FontSizes.xxl,
     fontWeight: '800',
     color: Colors.textPrimary,
-    lineHeight: 42,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   subtitle: {
-    fontSize: FontSizes.md,
+    fontSize: FontSizes.xs,
     color: Colors.textSecondary,
     marginBottom: Spacing.xl,
+    lineHeight: 18,
   },
 
   field: { marginBottom: Spacing.md },
   fieldLabel: {
-    fontSize: FontSizes.sm,
-    fontWeight: '600',
+    fontSize: 10,
+    fontWeight: '700',
     color: Colors.textSecondary,
     textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    letterSpacing: 1,
     marginBottom: 6,
   },
   input: {
@@ -206,7 +215,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     paddingHorizontal: Spacing.md,
     paddingVertical: 14,
-    fontSize: FontSizes.md,
+    fontSize: FontSizes.sm,
     color: Colors.textPrimary,
   },
 
@@ -221,25 +230,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   optionBtnActive: {
-    backgroundColor: Colors.accentGlow,
-    borderColor: Colors.accent,
+    backgroundColor: Colors.goldGlow,
+    borderColor: Colors.borderGold,
   },
   optionText: {
-    fontSize: FontSizes.md,
+    fontSize: FontSizes.sm,
     color: Colors.textSecondary,
     fontWeight: '600',
   },
-  optionTextActive: { color: Colors.accent },
+  optionTextActive: { color: Colors.gold, fontWeight: '700' },
 
   rowFields: { flexDirection: 'row' },
 
   nextBtn: {
-    backgroundColor: Colors.accent,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.gold,
     paddingVertical: 16,
     borderRadius: Radii.full,
-    alignItems: 'center',
+    gap: 8,
     marginTop: Spacing.lg,
-    ...Shadows.accent,
+    ...Shadows.gold,
   },
   nextBtnDisabled: {
     backgroundColor: Colors.bgElevated,
@@ -247,8 +259,12 @@ const styles = StyleSheet.create({
     elevation: 0,
   },
   nextBtnText: {
-    fontSize: FontSizes.lg,
+    fontSize: FontSizes.sm,
     fontWeight: '800',
     color: Colors.bg,
+    letterSpacing: 0.5,
+  },
+  nextBtnTextDisabled: {
+    color: Colors.textMuted,
   },
 });

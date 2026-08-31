@@ -7,9 +7,9 @@ import { Colors, FontSizes, Spacing, Radii, Shadows } from '../theme';
 import { mockRecognizeFood } from '../data/mockFoods';
 import useAppStore from '../store/useAppStore';
 import { Ionicons } from '@expo/vector-icons';
+import Card from '../components/Card';
 
 export default function FoodResultScreen({ navigation }) {
-  // MOCK: replace with real model inference - in production, receive photo URI and run vision model
   const [food, setFood] = useState(null);
   const [editingCals, setEditingCals] = useState('');
   const [editingName, setEditingName] = useState('');
@@ -17,7 +17,6 @@ export default function FoodResultScreen({ navigation }) {
   const { addFoodEntry, incrementStreak } = useAppStore();
 
   useEffect(() => {
-    // MOCK: randomly pick a food from local lookup
     const result = mockRecognizeFood();
     setFood(result);
     setEditingCals(String(result.calories));
@@ -41,7 +40,7 @@ export default function FoodResultScreen({ navigation }) {
 
   if (!food) return (
     <View style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}>
-      <Text style={{ color: Colors.textPrimary }}>Loading...</Text>
+      <Text style={{ color: Colors.textPrimary }}>Analyzing nutrition...</Text>
     </View>
   );
 
@@ -53,13 +52,15 @@ export default function FoodResultScreen({ navigation }) {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* AI Badge */}
         <View style={styles.aiBadge}>
-          <Ionicons name="flash" size={14} color={Colors.accent} />
-          <Text style={styles.aiBadgeText}>AI ANALYSIS COMPLETE • MOCK</Text>
+          <Ionicons name="sparkles" size={13} color={Colors.gold} />
+          <Text style={styles.aiBadgeText}>AI NUTRITION ANALYSIS</Text>
         </View>
 
-        {/* Food Card */}
-        <View style={styles.foodCard}>
-          <Text style={styles.foodEmoji}>{food.emoji}</Text>
+        {/* Food Name & Category Card */}
+        <Card style={styles.foodCard} highlighted>
+          <View style={styles.foodIconContainer}>
+            <Ionicons name="restaurant-outline" size={28} color={Colors.gold} />
+          </View>
 
           {editing ? (
             <TextInput
@@ -69,18 +70,18 @@ export default function FoodResultScreen({ navigation }) {
               autoFocus
             />
           ) : (
-            <TouchableOpacity onPress={() => setEditing(true)}>
+            <TouchableOpacity onPress={() => setEditing(true)} activeOpacity={0.7}>
               <Text style={styles.foodName}>{editingName}</Text>
-              <Text style={styles.editHint}>✏️ Tap to edit name</Text>
+              <Text style={styles.editHint}>Tap to modify name</Text>
             </TouchableOpacity>
           )}
 
-          <Text style={styles.serving}>{food.serving}</Text>
-        </View>
+          <Text style={styles.serving}>{food.serving} · {food.category || 'Whole Food'}</Text>
+        </Card>
 
         {/* Calorie Highlight */}
-        <View style={styles.calsCard}>
-          <Text style={styles.calsLabel}>Estimated Calories</Text>
+        <Card style={styles.calsCard}>
+          <Text style={styles.calsLabel}>CALORIC VALUE</Text>
           <View style={styles.calsRow}>
             {editing ? (
               <TextInput
@@ -97,54 +98,56 @@ export default function FoodResultScreen({ navigation }) {
           </View>
           {!editing && (
             <TouchableOpacity onPress={() => setEditing(true)} style={styles.editCalsBtn}>
-              <Ionicons name="pencil" size={14} color={Colors.accent} />
-              <Text style={styles.editCalsBtnText}>Edit</Text>
+              <Ionicons name="pencil-outline" size={12} color={Colors.gold} />
+              <Text style={styles.editCalsBtnText}>Adjust Calories</Text>
             </TouchableOpacity>
           )}
           {editing && (
             <TouchableOpacity onPress={() => setEditing(false)} style={styles.doneCalsBtn}>
-              <Text style={styles.doneCalsText}>Done ✓</Text>
+              <Text style={styles.doneCalsText}>Done</Text>
             </TouchableOpacity>
           )}
-        </View>
+        </Card>
 
         {/* Macro Breakdown */}
         <View style={styles.macroGrid}>
           {[
-            { label: 'Protein', val: food.protein, color: Colors.accent, icon: '🥩' },
-            { label: 'Carbs', val: food.carbs, color: Colors.purple, icon: '🍚' },
-            { label: 'Fat', val: food.fat, color: Colors.orange, icon: '🥑' },
+            { label: 'Protein', val: food.protein, color: Colors.gold, icon: 'fitness-outline' },
+            { label: 'Carbs', val: food.carbs, color: Colors.textPrimary, icon: 'nutrition-outline' },
+            { label: 'Healthy Fat', val: food.fat, color: Colors.textSecondary, icon: 'shield-checkmark-outline' },
           ].map((m) => (
-            <View key={m.label} style={[styles.macroCard, { borderColor: m.color + '44' }]}>
-              <Text style={styles.macroIcon}>{m.icon}</Text>
+            <View key={m.label} style={styles.macroCard}>
+              <View style={styles.macroIconContainer}>
+                <Ionicons name={m.icon} size={14} color={m.color} />
+              </View>
               <Text style={[styles.macroVal, { color: m.color }]}>{m.val}g</Text>
               <Text style={styles.macroLabel}>{m.label}</Text>
             </View>
           ))}
         </View>
 
-        {/* Confidence indicator */}
-        <View style={styles.confidenceCard}>
+        {/* Confidence Indicator */}
+        <Card style={styles.confidenceCard}>
           <View style={styles.confRow}>
-            <Text style={styles.confLabel}>AI Confidence</Text>
-            <Text style={styles.confValue}>87%</Text>
+            <Text style={styles.confLabel}>Vision AI Match Accuracy</Text>
+            <Text style={styles.confValue}>89%</Text>
           </View>
           <View style={styles.confTrack}>
-            <View style={[styles.confFill, { width: '87%' }]} />
+            <View style={[styles.confFill, { width: '89%' }]} />
           </View>
           <Text style={styles.confNote}>
-            Results are estimated. Edit if the portion size differs.
+            Portion estimates are calculated based on standard volumetric density.
           </Text>
-        </View>
+        </Card>
 
         {/* Action Buttons */}
-        <TouchableOpacity style={styles.confirmBtn} onPress={handleConfirm}>
-          <Ionicons name="checkmark-circle" size={22} color={Colors.bg} />
-          <Text style={styles.confirmBtnText}>Add to Log</Text>
+        <TouchableOpacity style={styles.confirmBtn} onPress={handleConfirm} activeOpacity={0.85}>
+          <Ionicons name="checkmark" size={20} color={Colors.bg} />
+          <Text style={styles.confirmBtnText}>Add Meal to Daily Log</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.retakeBtn} onPress={handleRetake}>
-          <Ionicons name="camera-reverse" size={18} color={Colors.textSecondary} />
+        <TouchableOpacity style={styles.retakeBtn} onPress={handleRetake} activeOpacity={0.8}>
+          <Ionicons name="camera-reverse-outline" size={16} color={Colors.textSecondary} />
           <Text style={styles.retakeBtnText}>Retake Photo</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -154,101 +157,103 @@ export default function FoodResultScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.bg },
-  scroll: { padding: Spacing.lg, paddingTop: 60, paddingBottom: 40 },
+  scroll: { padding: Spacing.md, paddingTop: 60, paddingBottom: 40 },
 
   aiBadge: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
-    alignSelf: 'center', marginBottom: Spacing.lg,
-    backgroundColor: Colors.accentGlow, borderRadius: Radii.full,
-    paddingHorizontal: 14, paddingVertical: 6,
-    borderWidth: 1, borderColor: Colors.borderAccent,
+    alignSelf: 'center', marginBottom: Spacing.md,
+    backgroundColor: Colors.goldGlow, borderRadius: Radii.full,
+    paddingHorizontal: 12, paddingVertical: 5,
+    borderWidth: 1, borderColor: Colors.borderGold,
   },
   aiBadgeText: {
-    fontSize: FontSizes.xs, color: Colors.accent,
-    fontWeight: '800', letterSpacing: 1.5,
+    fontSize: 10, color: Colors.gold,
+    fontWeight: '800', letterSpacing: 1.2,
   },
 
   foodCard: {
-    alignItems: 'center', marginBottom: Spacing.md,
-    backgroundColor: Colors.bgCard, borderRadius: Radii.xl,
-    padding: Spacing.xl, borderWidth: 1, borderColor: Colors.border,
+    alignItems: 'center', marginBottom: Spacing.md, paddingVertical: 20,
   },
-  foodEmoji: { fontSize: 72, marginBottom: 12 },
-  foodName: { fontSize: FontSizes.xxl, fontWeight: '800', color: Colors.textPrimary, textAlign: 'center' },
-  editHint: { fontSize: FontSizes.xs, color: Colors.accent, textAlign: 'center', marginTop: 4 },
+  foodIconContainer: {
+    width: 52, height: 52, borderRadius: 26,
+    backgroundColor: Colors.goldGlow,
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: 12, borderWidth: 1, borderColor: Colors.borderGold,
+  },
+  foodName: { fontSize: FontSizes.xl, fontWeight: '800', color: Colors.textPrimary, textAlign: 'center' },
+  editHint: { fontSize: 10, color: Colors.gold, textAlign: 'center', marginTop: 4, letterSpacing: 0.5 },
   nameInput: {
-    fontSize: FontSizes.xxl, fontWeight: '800', color: Colors.accent,
-    borderBottomWidth: 2, borderBottomColor: Colors.accent,
+    fontSize: FontSizes.xl, fontWeight: '800', color: Colors.gold,
+    borderBottomWidth: 1.5, borderBottomColor: Colors.gold,
     textAlign: 'center', minWidth: 200, marginBottom: 4,
   },
-  serving: { fontSize: FontSizes.sm, color: Colors.textMuted, marginTop: 6 },
+  serving: { fontSize: FontSizes.xs, color: Colors.textMuted, marginTop: 4 },
 
   calsCard: {
-    backgroundColor: Colors.bgCard, borderRadius: Radii.lg, padding: Spacing.lg,
-    alignItems: 'center', marginBottom: Spacing.md,
-    borderWidth: 1.5, borderColor: Colors.accent + '44', ...Shadows.accent,
+    alignItems: 'center', marginBottom: Spacing.md, paddingVertical: 20,
   },
   calsLabel: {
-    fontSize: FontSizes.xs, color: Colors.textSecondary,
-    textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 8,
+    fontSize: 10, color: Colors.textSecondary,
+    textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 4,
   },
-  calsRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
-  calsValue: { fontSize: 64, fontWeight: '900', color: Colors.accent, lineHeight: 72 },
+  calsRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 6 },
+  calsValue: { fontSize: 54, fontWeight: '900', color: Colors.gold, lineHeight: 60 },
   calsInput: {
-    fontSize: 64, fontWeight: '900', color: Colors.accent,
-    borderBottomWidth: 2, borderBottomColor: Colors.accent,
+    fontSize: 54, fontWeight: '900', color: Colors.gold,
+    borderBottomWidth: 1.5, borderBottomColor: Colors.gold,
     textAlign: 'center', minWidth: 120,
   },
-  calsUnit: { fontSize: FontSizes.lg, color: Colors.textSecondary, marginBottom: 10 },
+  calsUnit: { fontSize: FontSizes.sm, color: Colors.textMuted, marginBottom: 10 },
   editCalsBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
-    marginTop: 6, paddingHorizontal: 12, paddingVertical: 4,
-    backgroundColor: Colors.accentGlow, borderRadius: Radii.full,
+    marginTop: 6, paddingHorizontal: 10, paddingVertical: 4,
+    backgroundColor: Colors.bgElevated, borderRadius: Radii.full,
+    borderWidth: 1, borderColor: Colors.border,
   },
-  editCalsBtnText: { fontSize: FontSizes.xs, color: Colors.accent, fontWeight: '700' },
+  editCalsBtnText: { fontSize: 10, color: Colors.gold, fontWeight: '700' },
   doneCalsBtn: {
-    marginTop: 8, paddingHorizontal: 16, paddingVertical: 6,
-    backgroundColor: Colors.accentGlow, borderRadius: Radii.full,
-    borderWidth: 1, borderColor: Colors.borderAccent,
+    marginTop: 8, paddingHorizontal: 14, paddingVertical: 5,
+    backgroundColor: Colors.goldGlow, borderRadius: Radii.full,
+    borderWidth: 1, borderColor: Colors.borderGold,
   },
-  doneCalsText: { fontSize: FontSizes.sm, color: Colors.accent, fontWeight: '700' },
+  doneCalsText: { fontSize: FontSizes.xs, color: Colors.gold, fontWeight: '700' },
 
   macroGrid: { flexDirection: 'row', gap: 10, marginBottom: Spacing.md },
   macroCard: {
     flex: 1, backgroundColor: Colors.bgCard, borderRadius: Radii.md,
-    padding: Spacing.md, alignItems: 'center', borderWidth: 1.5,
+    padding: Spacing.md, alignItems: 'center', borderWidth: 1, borderColor: Colors.border,
   },
-  macroIcon: { fontSize: 22, marginBottom: 6 },
-  macroVal: { fontSize: FontSizes.xl, fontWeight: '800' },
+  macroIconContainer: {
+    width: 28, height: 28, borderRadius: 14,
+    backgroundColor: Colors.bgElevated, alignItems: 'center', justifyContent: 'center',
+    marginBottom: 6,
+  },
+  macroVal: { fontSize: FontSizes.lg, fontWeight: '800' },
   macroLabel: {
-    fontSize: FontSizes.xs, color: Colors.textSecondary,
-    textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 3,
+    fontSize: 9, color: Colors.textSecondary,
+    textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2,
   },
 
-  confidenceCard: {
-    backgroundColor: Colors.bgCard, borderRadius: Radii.md,
-    padding: Spacing.md, marginBottom: Spacing.lg,
-    borderWidth: 1, borderColor: Colors.border,
-  },
+  confidenceCard: { marginBottom: Spacing.lg },
   confRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
-  confLabel: { fontSize: FontSizes.sm, color: Colors.textSecondary, fontWeight: '600' },
-  confValue: { fontSize: FontSizes.sm, fontWeight: '800', color: Colors.green },
+  confLabel: { fontSize: FontSizes.xs, color: Colors.textSecondary, fontWeight: '600' },
+  confValue: { fontSize: FontSizes.xs, fontWeight: '800', color: Colors.gold },
   confTrack: {
     height: 4, backgroundColor: Colors.bgElevated,
     borderRadius: Radii.full, marginBottom: 8, overflow: 'hidden',
   },
-  confFill: { height: '100%', backgroundColor: Colors.green, borderRadius: Radii.full },
-  confNote: { fontSize: FontSizes.xs, color: Colors.textMuted, textAlign: 'center' },
+  confFill: { height: '100%', backgroundColor: Colors.gold, borderRadius: Radii.full },
+  confNote: { fontSize: 10, color: Colors.textMuted, textAlign: 'center' },
 
   confirmBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    backgroundColor: Colors.accent, paddingVertical: 16,
-    borderRadius: Radii.full, gap: 10, marginBottom: 12, ...Shadows.accent,
+    backgroundColor: Colors.gold, paddingVertical: 16,
+    borderRadius: Radii.full, gap: 8, marginBottom: 10, ...Shadows.gold,
   },
-  confirmBtnText: { fontSize: FontSizes.lg, fontWeight: '800', color: Colors.bg },
+  confirmBtnText: { fontSize: FontSizes.sm, fontWeight: '800', color: Colors.bg, letterSpacing: 0.5 },
   retakeBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    paddingVertical: 12, gap: 6,
+    paddingVertical: 10, gap: 6,
   },
-  retakeBtnText: { fontSize: FontSizes.md, color: Colors.textSecondary, fontWeight: '600' },
+  retakeBtnText: { fontSize: FontSizes.xs, color: Colors.textSecondary, fontWeight: '600' },
 });

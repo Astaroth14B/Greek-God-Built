@@ -10,20 +10,23 @@ import { Ionicons } from '@expo/vector-icons';
 
 const StarRating = ({ rating }) => {
   const full = Math.floor(rating);
-  const half = rating % 1 >= 0.5;
+  const hasHalf = rating % 1 >= 0.5;
   return (
     <View style={styles.stars}>
       {Array.from({ length: 5 }, (_, i) => (
-        <Text key={i} style={styles.star}>
-          {i < full ? '★' : half && i === full ? '⯨' : '☆'}
-        </Text>
+        <Ionicons
+          key={i}
+          name={i < full ? 'star' : (hasHalf && i === full) ? 'star-half' : 'star-outline'}
+          size={12}
+          color={Colors.gold}
+        />
       ))}
       <Text style={styles.ratingNum}>{rating}</Text>
     </View>
   );
 };
 
-const CATEGORY_ICONS = { All: 'people', Trainer: 'barbell', Dietitian: 'nutrition', Doctor: 'medical' };
+const CATEGORY_ICONS = { All: 'people-outline', Trainer: 'barbell-outline', Dietitian: 'restaurant-outline', Doctor: 'medkit-outline' };
 
 export default function ProsScreen({ navigation }) {
   const [activeCategory, setActiveCategory] = useState('All');
@@ -41,13 +44,13 @@ export default function ProsScreen({ navigation }) {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>Find a Pro</Text>
-          <Text style={styles.subtitle}>Connect with certified trainers, dietitians & doctors</Text>
+          <Text style={styles.title}>Coaches & Specialists</Text>
+          <Text style={styles.subtitle}>Verified strength coaches, nutritionists & sports physicians</Text>
         </View>
 
         {/* Search */}
         <View style={styles.searchContainer}>
-          <Ionicons name="search" size={18} color={Colors.textMuted} style={styles.searchIcon} />
+          <Ionicons name="search-outline" size={18} color={Colors.textMuted} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             value={search}
@@ -60,37 +63,40 @@ export default function ProsScreen({ navigation }) {
         {/* Category Tabs */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
           <View style={styles.categoryRow}>
-            {PRO_CATEGORIES.map((cat) => (
-              <TouchableOpacity
-                key={cat}
-                style={[styles.categoryBtn, activeCategory === cat && styles.categoryBtnActive]}
-                onPress={() => setActiveCategory(cat)}
-              >
-                <Ionicons
-                  name={CATEGORY_ICONS[cat] || 'person'}
-                  size={14}
-                  color={activeCategory === cat ? Colors.bg : Colors.textSecondary}
-                />
-                <Text style={[styles.categoryText, activeCategory === cat && styles.categoryTextActive]}>
-                  {cat}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            {PRO_CATEGORIES.map((cat) => {
+              const isActive = activeCategory === cat;
+              return (
+                <TouchableOpacity
+                  key={cat}
+                  style={[styles.categoryBtn, isActive && styles.categoryBtnActive]}
+                  onPress={() => setActiveCategory(cat)}
+                >
+                  <Ionicons
+                    name={CATEGORY_ICONS[cat] || 'person-outline'}
+                    size={14}
+                    color={isActive ? Colors.gold : Colors.textSecondary}
+                  />
+                  <Text style={[styles.categoryText, isActive && styles.categoryTextActive]}>
+                    {cat}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </ScrollView>
 
         {/* Results count */}
         <Text style={styles.resultsCount}>
-          {filtered.length} professional{filtered.length !== 1 ? 's' : ''} available
+          {filtered.length} verified coach{filtered.length !== 1 ? 'es' : ''} available
         </Text>
 
         {/* Pro Cards */}
         {filtered.map((pro) => (
           <Card key={pro.id} style={styles.proCard}>
-            {/* Avatar */}
+            {/* Avatar & Header */}
             <View style={styles.proHeader}>
               <View style={styles.proAvatar}>
-                <Text style={styles.proAvatarEmoji}>{pro.emoji}</Text>
+                <Text style={styles.proInitials}>{pro.initials || pro.name.slice(0, 2).toUpperCase()}</Text>
               </View>
               <View style={styles.proInfo}>
                 <Text style={styles.proName}>{pro.name}</Text>
@@ -109,25 +115,26 @@ export default function ProsScreen({ navigation }) {
 
             {/* Reviews */}
             <View style={styles.reviewRow}>
-              <Ionicons name="chatbubble-outline" size={13} color={Colors.textMuted} />
-              <Text style={styles.reviewCount}>{pro.reviews} reviews</Text>
+              <Ionicons name="chatbubble-outline" size={12} color={Colors.textMuted} />
+              <Text style={styles.reviewCount}>{pro.reviews} verified sessions</Text>
             </View>
 
             <TouchableOpacity
               style={styles.bookBtn}
               onPress={() => navigation.navigate('Booking', { pro })}
+              activeOpacity={0.85}
             >
-              <Text style={styles.bookBtnText}>Book Session</Text>
-              <Ionicons name="arrow-forward" size={16} color={Colors.bg} />
+              <Text style={styles.bookBtnText}>Book 1-on-1 Consultation</Text>
+              <Ionicons name="arrow-forward" size={15} color={Colors.bg} />
             </TouchableOpacity>
           </Card>
         ))}
 
         {filtered.length === 0 && (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyEmoji}>🔍</Text>
-            <Text style={styles.emptyTitle}>No results found</Text>
-            <Text style={styles.emptyDesc}>Try a different search or category.</Text>
+            <Ionicons name="search-outline" size={36} color={Colors.textMuted} />
+            <Text style={styles.emptyTitle}>No specialists found</Text>
+            <Text style={styles.emptyDesc}>Try searching with a different keyword or category.</Text>
           </View>
         )}
       </ScrollView>
@@ -140,8 +147,8 @@ const styles = StyleSheet.create({
   scroll: { padding: Spacing.md, paddingTop: 60, paddingBottom: 40 },
 
   header: { marginBottom: Spacing.md },
-  title: { fontSize: FontSizes.xxxl, fontWeight: '900', color: Colors.textPrimary },
-  subtitle: { fontSize: FontSizes.md, color: Colors.textSecondary, marginTop: 4 },
+  title: { fontSize: FontSizes.xxl, fontWeight: '800', color: Colors.textPrimary },
+  subtitle: { fontSize: FontSizes.xs, color: Colors.textSecondary, marginTop: 4 },
 
   searchContainer: {
     flexDirection: 'row', alignItems: 'center',
@@ -150,64 +157,62 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12, marginBottom: Spacing.md,
   },
   searchIcon: { marginRight: 8 },
-  searchInput: { flex: 1, paddingVertical: 12, fontSize: FontSizes.md, color: Colors.textPrimary },
+  searchInput: { flex: 1, paddingVertical: 12, fontSize: FontSizes.sm, color: Colors.textPrimary },
 
   categoryScroll: { marginBottom: Spacing.md },
   categoryRow: { flexDirection: 'row', gap: 8 },
   categoryBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: 5,
+    flexDirection: 'row', alignItems: 'center', gap: 6,
     paddingHorizontal: 14, paddingVertical: 8,
     borderRadius: Radii.full, backgroundColor: Colors.bgCard,
     borderWidth: 1, borderColor: Colors.border,
   },
-  categoryBtnActive: { backgroundColor: Colors.accent, borderColor: Colors.accent },
-  categoryText: { fontSize: FontSizes.sm, fontWeight: '600', color: Colors.textSecondary },
-  categoryTextActive: { color: Colors.bg },
+  categoryBtnActive: { backgroundColor: Colors.goldGlow, borderColor: Colors.borderGold },
+  categoryText: { fontSize: FontSizes.xs, fontWeight: '600', color: Colors.textSecondary },
+  categoryTextActive: { color: Colors.gold, fontWeight: '700' },
 
   resultsCount: {
-    fontSize: FontSizes.xs, color: Colors.textMuted,
-    marginBottom: 12, letterSpacing: 0.5,
+    fontSize: 10, color: Colors.textMuted,
+    marginBottom: 12, letterSpacing: 0.8, textTransform: 'uppercase',
   },
 
   proCard: { marginBottom: 12 },
   proHeader: { flexDirection: 'row', marginBottom: 10 },
   proAvatar: {
-    width: 56, height: 56, borderRadius: 28,
+    width: 48, height: 48, borderRadius: 24,
     backgroundColor: Colors.bgElevated, alignItems: 'center', justifyContent: 'center',
-    marginRight: 12, borderWidth: 2, borderColor: Colors.borderAccent,
+    marginRight: 12, borderWidth: 1, borderColor: Colors.borderGold,
   },
-  proAvatarEmoji: { fontSize: 26 },
+  proInitials: { fontSize: FontSizes.sm, fontWeight: '800', color: Colors.gold },
   proInfo: { flex: 1 },
-  proName: { fontSize: FontSizes.md, fontWeight: '800', color: Colors.textPrimary },
-  proSpecialty: { fontSize: FontSizes.sm, color: Colors.accent, fontWeight: '600', marginVertical: 2 },
-  stars: { flexDirection: 'row', alignItems: 'center', gap: 2 },
-  star: { fontSize: 12, color: '#FFD700' },
-  ratingNum: { fontSize: FontSizes.xs, color: Colors.textSecondary, marginLeft: 4, fontWeight: '600' },
+  proName: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.textPrimary },
+  proSpecialty: { fontSize: FontSizes.xs, color: Colors.gold, fontWeight: '600', marginTop: 1 },
+  stars: { flexDirection: 'row', alignItems: 'center', gap: 2, marginTop: 4 },
+  ratingNum: { fontSize: 10, color: Colors.textSecondary, marginLeft: 4, fontWeight: '700' },
   proPriceContainer: { alignItems: 'flex-end' },
-  proPrice: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.green },
+  proPrice: { fontSize: FontSizes.xs, fontWeight: '700', color: Colors.textPrimary },
   expBadge: {
     backgroundColor: Colors.bgElevated, borderRadius: Radii.sm,
     paddingHorizontal: 6, paddingVertical: 2, marginTop: 4,
     borderWidth: 1, borderColor: Colors.border,
   },
-  expText: { fontSize: FontSizes.xs, color: Colors.textMuted },
+  expText: { fontSize: 9, color: Colors.textMuted, textTransform: 'uppercase' },
 
   proBio: {
-    fontSize: FontSizes.sm, color: Colors.textSecondary,
-    lineHeight: 20, marginBottom: 10,
+    fontSize: FontSizes.xs, color: Colors.textSecondary,
+    lineHeight: 18, marginBottom: 10,
   },
-  reviewRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 12 },
-  reviewCount: { fontSize: FontSizes.xs, color: Colors.textMuted },
+  reviewRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 12 },
+  reviewCount: { fontSize: 10, color: Colors.textMuted },
 
   bookBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    backgroundColor: Colors.accent, borderRadius: Radii.md,
-    paddingVertical: 12, gap: 8, ...Shadows.accent,
+    backgroundColor: Colors.gold, borderRadius: Radii.md,
+    paddingVertical: 12, gap: 6, ...Shadows.gold,
   },
-  bookBtnText: { fontSize: FontSizes.md, fontWeight: '800', color: Colors.bg },
+  bookBtnText: { fontSize: FontSizes.sm, fontWeight: '800', color: Colors.bg, letterSpacing: 0.3 },
 
   emptyState: { alignItems: 'center', paddingVertical: 40 },
-  emptyEmoji: { fontSize: 40, marginBottom: 12 },
-  emptyTitle: { fontSize: FontSizes.xl, fontWeight: '800', color: Colors.textPrimary, marginBottom: 6 },
-  emptyDesc: { fontSize: FontSizes.md, color: Colors.textSecondary },
+  emptyTitle: { fontSize: FontSizes.lg, fontWeight: '800', color: Colors.textPrimary, marginTop: 10, marginBottom: 6 },
+  emptyDesc: { fontSize: FontSizes.sm, color: Colors.textSecondary, textAlign: 'center' },
 });

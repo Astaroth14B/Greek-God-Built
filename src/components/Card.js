@@ -3,11 +3,18 @@ import { View, StyleSheet } from 'react-native';
 import { Colors, Radii, Shadows } from '../theme';
 
 /**
- * Reusable card component with glass-dark styling
+ * Clean minimalist obsidian card component
  */
-const Card = ({ children, style, noPadding = false }) => {
+const Card = ({ children, style, highlighted = false, noPadding = false }) => {
   return (
-    <View style={[styles.card, noPadding && styles.noPadding, style]}>
+    <View
+      style={[
+        styles.card,
+        highlighted && styles.cardHighlighted,
+        noPadding && styles.noPadding,
+        style,
+      ]}
+    >
       {children}
     </View>
   );
@@ -21,6 +28,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
     ...Shadows.card,
+  },
+  cardHighlighted: {
+    borderColor: Colors.borderGold,
+    backgroundColor: '#16161D',
   },
   noPadding: {
     padding: 0,

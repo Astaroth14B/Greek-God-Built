@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
   Animated,
@@ -8,25 +8,25 @@ import { Ionicons } from '@expo/vector-icons';
 import Card from '../components/Card';
 
 const EXERCISES = [
-  { id: 'squat', name: 'Barbell Squat', emoji: '🦵', muscles: 'Quads, Glutes, Core', difficulty: 'Intermediate' },
-  { id: 'pushup', name: 'Push-Up', emoji: '💪', muscles: 'Chest, Shoulders, Triceps', difficulty: 'Beginner' },
-  { id: 'deadlift', name: 'Deadlift', emoji: '🏋️', muscles: 'Back, Hamstrings, Glutes', difficulty: 'Advanced' },
-  { id: 'lunges', name: 'Walking Lunges', emoji: '🚶', muscles: 'Quads, Glutes, Balance', difficulty: 'Beginner' },
-  { id: 'ohpress', name: 'Overhead Press', emoji: '🙌', muscles: 'Shoulders, Triceps, Core', difficulty: 'Intermediate' },
-  { id: 'pullup', name: 'Pull-Up', emoji: '🔝', muscles: 'Lats, Biceps, Rear Delt', difficulty: 'Advanced' },
+  { id: 'squat', name: 'Barbell Squat', icon: 'barbell-outline', muscles: 'Quads, Glutes, Core', difficulty: 'Intermediate' },
+  { id: 'pushup', name: 'Push-Up Protocol', icon: 'body-outline', muscles: 'Chest, Shoulders, Triceps', difficulty: 'Beginner' },
+  { id: 'deadlift', name: 'Conventional Deadlift', icon: 'barbell-outline', muscles: 'Hamstrings, Back, Glutes', difficulty: 'Advanced' },
+  { id: 'lunges', name: 'Walking Lunges', icon: 'walk-outline', muscles: 'Quads, Balance, Core', difficulty: 'Beginner' },
+  { id: 'ohpress', name: 'Overhead Press', icon: 'fitness-outline', muscles: 'Deltoids, Triceps, Core', difficulty: 'Intermediate' },
+  { id: 'pullup', name: 'Strict Pull-Up', icon: 'trending-up-outline', muscles: 'Lats, Biceps, Rear Delts', difficulty: 'Advanced' },
 ];
 
-const DIFFICULTY_COLORS = {
-  Beginner: Colors.green,
-  Intermediate: Colors.accent,
-  Advanced: Colors.orange,
+const DIFFICULTY_STYLES = {
+  Beginner: { color: Colors.green, border: Colors.green + '55', bg: Colors.greenGlow },
+  Intermediate: { color: Colors.gold, border: Colors.borderGold, bg: Colors.goldGlow },
+  Advanced: { color: Colors.orange, border: Colors.orange + '55', bg: Colors.orangeGlow },
 };
 
 export default function WorkoutScreen({ navigation }) {
   const [selected, setSelected] = useState(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  React.useEffect(() => {
+  useEffect(() => {
     Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }).start();
   }, []);
 
@@ -35,60 +35,70 @@ export default function WorkoutScreen({ navigation }) {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>AI Form Tracker</Text>
+          <Text style={styles.title}>AI Form Tracking</Text>
           <Text style={styles.subtitle}>
-            Pick an exercise and our AI will count your reps and coach your form in real time.
+            Real-time biometric pose analysis and rep counting via front camera.
           </Text>
         </View>
 
         {/* How it works */}
-        <Card style={styles.howCard}>
-          <Text style={styles.howTitle}>⚡ How it works</Text>
+        <Card style={styles.howCard} highlighted>
+          <View style={styles.howHeader}>
+            <Ionicons name="scan-outline" size={16} color={Colors.gold} />
+            <Text style={styles.howTitle}>SETUP PROTOCOL</Text>
+          </View>
           <View style={styles.step}>
             <View style={styles.stepNum}><Text style={styles.stepNumText}>1</Text></View>
-            <Text style={styles.stepText}>Choose your exercise below</Text>
+            <Text style={styles.stepText}>Select your compound or bodyweight exercise below</Text>
           </View>
           <View style={styles.step}>
             <View style={styles.stepNum}><Text style={styles.stepNumText}>2</Text></View>
-            <Text style={styles.stepText}>Prop your phone 5–6 ft away (front-facing camera)</Text>
+            <Text style={styles.stepText}>Position device 5–6 feet away with front camera active</Text>
           </View>
           <View style={styles.step}>
             <View style={styles.stepNum}><Text style={styles.stepNumText}>3</Text></View>
-            <Text style={styles.stepText}>AI tracks your reps and gives real-time form tips</Text>
+            <Text style={styles.stepText}>Computer vision tracks joint angles, pacing & reps</Text>
           </View>
         </Card>
 
         {/* Exercise Selection */}
-        <Text style={styles.sectionTitle}>Choose Exercise</Text>
-        {EXERCISES.map((ex) => (
-          <TouchableOpacity
-            key={ex.id}
-            style={[styles.exerciseCard, selected === ex.id && styles.exerciseCardActive]}
-            onPress={() => setSelected(ex.id)}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.exerciseEmoji}>{ex.emoji}</Text>
-            <View style={styles.exerciseInfo}>
-              <Text style={styles.exerciseName}>{ex.name}</Text>
-              <Text style={styles.exerciseMuscles}>{ex.muscles}</Text>
-            </View>
-            <View>
-              <View style={[
-                styles.diffBadge,
-                { backgroundColor: DIFFICULTY_COLORS[ex.difficulty] + '20', borderColor: DIFFICULTY_COLORS[ex.difficulty] + '55' }
-              ]}>
-                <Text style={[styles.diffText, { color: DIFFICULTY_COLORS[ex.difficulty] }]}>
-                  {ex.difficulty}
-                </Text>
+        <Text style={styles.sectionTitle}>SELECT EXERCISE</Text>
+        {EXERCISES.map((ex) => {
+          const isSelected = selected === ex.id;
+          const diffStyle = DIFFICULTY_STYLES[ex.difficulty] || DIFFICULTY_STYLES.Beginner;
+          return (
+            <TouchableOpacity
+              key={ex.id}
+              style={[styles.exerciseCard, isSelected && styles.exerciseCardActive]}
+              onPress={() => setSelected(ex.id)}
+              activeOpacity={0.8}
+            >
+              <View style={[styles.exerciseIconContainer, isSelected && styles.exerciseIconActive]}>
+                <Ionicons
+                  name={ex.icon}
+                  size={20}
+                  color={isSelected ? Colors.gold : Colors.textSecondary}
+                />
               </View>
-              {selected === ex.id && (
-                <View style={styles.checkCircle}>
-                  <Ionicons name="checkmark" size={14} color={Colors.bg} />
+              <View style={styles.exerciseInfo}>
+                <Text style={styles.exerciseName}>{ex.name}</Text>
+                <Text style={styles.exerciseMuscles}>{ex.muscles}</Text>
+              </View>
+              <View style={styles.exerciseRight}>
+                <View style={[styles.diffBadge, { backgroundColor: diffStyle.bg, borderColor: diffStyle.border }]}>
+                  <Text style={[styles.diffText, { color: diffStyle.color }]}>
+                    {ex.difficulty}
+                  </Text>
                 </View>
-              )}
-            </View>
-          </TouchableOpacity>
-        ))}
+                {isSelected && (
+                  <View style={styles.checkCircle}>
+                    <Ionicons name="checkmark" size={12} color={Colors.bg} />
+                  </View>
+                )}
+              </View>
+            </TouchableOpacity>
+          );
+        })}
 
         {/* Start Button */}
         <TouchableOpacity
@@ -97,12 +107,13 @@ export default function WorkoutScreen({ navigation }) {
           onPress={() => navigation.navigate('WorkoutCamera', {
             exercise: EXERCISES.find((e) => e.id === selected),
           })}
+          activeOpacity={0.85}
         >
-          <Ionicons name="camera" size={22} color={Colors.bg} />
-          <Text style={styles.startBtnText}>
+          <Ionicons name="camera-outline" size={20} color={selected ? Colors.bg : Colors.textMuted} />
+          <Text style={[styles.startBtnText, !selected && styles.startBtnTextDisabled]}>
             {selected
-              ? `Start ${EXERCISES.find(e => e.id === selected)?.name} Session`
-              : 'Select an exercise to start'}
+              ? `Begin ${EXERCISES.find(e => e.id === selected)?.name}`
+              : 'Select an exercise to continue'}
           </Text>
         </TouchableOpacity>
       </ScrollView>
@@ -115,56 +126,66 @@ const styles = StyleSheet.create({
   scroll: { padding: Spacing.md, paddingTop: 60, paddingBottom: 40 },
 
   header: { marginBottom: Spacing.lg },
-  title: { fontSize: FontSizes.xxxl, fontWeight: '900', color: Colors.textPrimary },
-  subtitle: { fontSize: FontSizes.md, color: Colors.textSecondary, marginTop: 6, lineHeight: 22 },
+  title: { fontSize: FontSizes.xxl, fontWeight: '800', color: Colors.textPrimary },
+  subtitle: { fontSize: FontSizes.sm, color: Colors.textSecondary, marginTop: 4, lineHeight: 20 },
 
-  howCard: { marginBottom: Spacing.lg, borderColor: Colors.accentGlow },
-  howTitle: { fontSize: FontSizes.md, fontWeight: '800', color: Colors.accent, marginBottom: 12 },
+  howCard: { marginBottom: Spacing.lg },
+  howHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
+  howTitle: { fontSize: FontSizes.xs, fontWeight: '800', color: Colors.gold, letterSpacing: 1 },
   step: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   stepNum: {
-    width: 24, height: 24, borderRadius: 12,
-    backgroundColor: Colors.accentGlow, borderWidth: 1, borderColor: Colors.borderAccent,
+    width: 22, height: 22, borderRadius: 11,
+    backgroundColor: Colors.goldGlow, borderWidth: 1, borderColor: Colors.borderGold,
     alignItems: 'center', justifyContent: 'center', marginRight: 10,
   },
-  stepNumText: { fontSize: FontSizes.xs, fontWeight: '800', color: Colors.accent },
-  stepText: { flex: 1, fontSize: FontSizes.sm, color: Colors.textSecondary },
+  stepNumText: { fontSize: 10, fontWeight: '800', color: Colors.gold },
+  stepText: { flex: 1, fontSize: FontSizes.xs, color: Colors.textSecondary, lineHeight: 18 },
 
   sectionTitle: {
-    fontSize: FontSizes.sm, fontWeight: '700', color: Colors.textSecondary,
-    textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10,
+    fontSize: FontSizes.xs, fontWeight: '700', color: Colors.textSecondary,
+    textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 10,
   },
 
   exerciseCard: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: Colors.bgCard, borderRadius: Radii.md,
-    padding: 14, marginBottom: 8, borderWidth: 1.5, borderColor: Colors.border,
+    padding: 14, marginBottom: 8, borderWidth: 1, borderColor: Colors.border,
   },
   exerciseCardActive: {
-    borderColor: Colors.accent, backgroundColor: Colors.accentGlow,
+    borderColor: Colors.borderGold, backgroundColor: '#181820',
   },
-  exerciseEmoji: { fontSize: 28, marginRight: 12 },
+  exerciseIconContainer: {
+    width: 40, height: 40, borderRadius: 20,
+    backgroundColor: Colors.bgElevated,
+    alignItems: 'center', justifyContent: 'center',
+    marginRight: 12, borderWidth: 1, borderColor: Colors.border,
+  },
+  exerciseIconActive: {
+    backgroundColor: Colors.goldGlow, borderColor: Colors.borderGold,
+  },
   exerciseInfo: { flex: 1 },
-  exerciseName: { fontSize: FontSizes.md, fontWeight: '700', color: Colors.textPrimary },
-  exerciseMuscles: { fontSize: FontSizes.xs, color: Colors.textMuted, marginTop: 3 },
+  exerciseName: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.textPrimary },
+  exerciseMuscles: { fontSize: FontSizes.xs, color: Colors.textMuted, marginTop: 2 },
+  exerciseRight: { alignItems: 'flex-end', gap: 4 },
   diffBadge: {
-    paddingHorizontal: 8, paddingVertical: 3,
+    paddingHorizontal: 8, paddingVertical: 2,
     borderRadius: Radii.full, borderWidth: 1,
   },
-  diffText: { fontSize: FontSizes.xs, fontWeight: '700' },
+  diffText: { fontSize: 9, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
   checkCircle: {
-    width: 22, height: 22, borderRadius: 11,
-    backgroundColor: Colors.accent, alignItems: 'center', justifyContent: 'center',
-    marginTop: 6, alignSelf: 'center',
+    width: 18, height: 18, borderRadius: 9,
+    backgroundColor: Colors.gold, alignItems: 'center', justifyContent: 'center',
   },
 
   startBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    backgroundColor: Colors.green, paddingVertical: 16,
-    borderRadius: Radii.full, gap: 10, marginTop: Spacing.md,
-    ...Shadows.green,
+    backgroundColor: Colors.gold, paddingVertical: 16,
+    borderRadius: Radii.full, gap: 8, marginTop: Spacing.md,
+    ...Shadows.gold,
   },
   startBtnDisabled: {
     backgroundColor: Colors.bgElevated, shadowOpacity: 0, elevation: 0,
   },
-  startBtnText: { fontSize: FontSizes.lg, fontWeight: '800', color: Colors.bg },
+  startBtnText: { fontSize: FontSizes.md, fontWeight: '800', color: Colors.bg, letterSpacing: 0.5 },
+  startBtnTextDisabled: { color: Colors.textMuted },
 });

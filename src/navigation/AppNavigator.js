@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Colors, FontSizes } from '../theme';
+import { Ionicons } from '@expo/vector-icons';
+import { Colors } from '../theme';
 import useAppStore from '../store/useAppStore';
 
 // Onboarding screens
@@ -46,21 +46,18 @@ function MainTabs() {
             HomeTab: focused ? 'home' : 'home-outline',
             LogTab: focused ? 'camera' : 'camera-outline',
             WorkoutTab: focused ? 'barbell' : 'barbell-outline',
-            DietTab: focused ? 'nutrition' : 'nutrition-outline',
+            DietTab: focused ? 'restaurant' : 'restaurant-outline',
             ProsTab: focused ? 'people' : 'people-outline',
           };
-          if (route.name === 'DietTab') {
-            return <MaterialCommunityIcons name={focused ? 'food-apple' : 'food-apple-outline'} size={size} color={color} />;
-          }
-          return <Ionicons name={icons[route.name] || 'home'} size={size} color={color} />;
+          return <Ionicons name={icons[route.name] || 'home-outline'} size={20} color={color} />;
         },
       })}
     >
-      <Tab.Screen name="HomeTab" component={HomeScreen} options={{ tabBarLabel: 'Olympus' }} />
-      <Tab.Screen name="LogTab" component={LogScreen} options={{ tabBarLabel: 'Ambrosia' }} />
-      <Tab.Screen name="WorkoutTab" component={WorkoutScreen} options={{ tabBarLabel: 'Titan Form' }} />
-      <Tab.Screen name="DietTab" component={DietScreen} options={{ tabBarLabel: 'Feast' }} />
-      <Tab.Screen name="ProsTab" component={ProsScreen} options={{ tabBarLabel: 'Masters' }} />
+      <Tab.Screen name="HomeTab" component={HomeScreen} options={{ tabBarLabel: 'Overview' }} />
+      <Tab.Screen name="LogTab" component={LogScreen} options={{ tabBarLabel: 'Food Log' }} />
+      <Tab.Screen name="WorkoutTab" component={WorkoutScreen} options={{ tabBarLabel: 'Workouts' }} />
+      <Tab.Screen name="DietTab" component={DietScreen} options={{ tabBarLabel: 'Nutrition' }} />
+      <Tab.Screen name="ProsTab" component={ProsScreen} options={{ tabBarLabel: 'Coaches' }} />
     </Tab.Navigator>
   );
 }
@@ -84,12 +81,10 @@ function AppNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {/* Onboarding — only shown before setup is complete */}
         {!hasCompletedOnboarding ? (
           <Stack.Screen name="Onboarding" component={OnboardingNavigator} />
         ) : null}
 
-        {/* Main app screens — only shown after onboarding */}
         {hasCompletedOnboarding ? (
           <Stack.Screen name="Main" component={MainTabs} />
         ) : null}
@@ -144,16 +139,17 @@ const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: Colors.tabBar,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 215, 0, 0.2)',
-    height: 78,
-    paddingBottom: 14,
+    borderTopColor: 'rgba(212, 175, 55, 0.18)',
+    height: 72,
+    paddingBottom: 12,
     paddingTop: 8,
   },
   tabLabel: {
     fontSize: 10,
     fontWeight: '700',
     marginTop: 2,
-    letterSpacing: 0.5,
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
   },
 });
 

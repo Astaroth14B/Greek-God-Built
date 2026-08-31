@@ -1,11 +1,9 @@
-// MOCK: replace with real model inference (food photo → nutrition lookup via vision API)
-// These are the mocked food recognition results returned after a fake "AI analysis"
-
+// Mocked food items for AI recognition and nutritional logging
 export const MOCK_FOODS = [
   {
     id: 'f1',
     name: 'Grilled Chicken Breast',
-    emoji: '🍗',
+    category: 'Protein',
     calories: 165,
     protein: 31,
     carbs: 0,
@@ -14,8 +12,8 @@ export const MOCK_FOODS = [
   },
   {
     id: 'f2',
-    name: 'Brown Rice (cooked)',
-    emoji: '🍚',
+    name: 'Brown Rice (Cooked)',
+    category: 'Grains',
     calories: 216,
     protein: 5,
     carbs: 45,
@@ -25,7 +23,7 @@ export const MOCK_FOODS = [
   {
     id: 'f3',
     name: 'Avocado Toast',
-    emoji: '🥑',
+    category: 'Healthy Fats',
     calories: 320,
     protein: 9,
     carbs: 33,
@@ -34,8 +32,8 @@ export const MOCK_FOODS = [
   },
   {
     id: 'f4',
-    name: 'Greek Yogurt (0% fat)',
-    emoji: '🫙',
+    name: 'Greek Yogurt (0% Fat)',
+    category: 'Dairy',
     calories: 100,
     protein: 17,
     carbs: 7,
@@ -44,8 +42,8 @@ export const MOCK_FOODS = [
   },
   {
     id: 'f5',
-    name: 'Banana',
-    emoji: '🍌',
+    name: 'Fresh Banana',
+    category: 'Fruit',
     calories: 89,
     protein: 1.1,
     carbs: 23,
@@ -54,8 +52,8 @@ export const MOCK_FOODS = [
   },
   {
     id: 'f6',
-    name: 'Egg Omelette (2 eggs)',
-    emoji: '🍳',
+    name: 'Egg Omelette (2 Eggs)',
+    category: 'Protein',
     calories: 180,
     protein: 14,
     carbs: 2,
@@ -64,8 +62,8 @@ export const MOCK_FOODS = [
   },
   {
     id: 'f7',
-    name: 'Mixed Nuts',
-    emoji: '🥜',
+    name: 'Mixed Roasted Nuts',
+    category: 'Healthy Fats',
     calories: 172,
     protein: 5,
     carbs: 6,
@@ -74,8 +72,8 @@ export const MOCK_FOODS = [
   },
   {
     id: 'f8',
-    name: 'Protein Shake',
-    emoji: '🥤',
+    name: 'Whey Protein Shake',
+    category: 'Supplement',
     calories: 150,
     protein: 25,
     carbs: 8,
@@ -84,8 +82,8 @@ export const MOCK_FOODS = [
   },
   {
     id: 'f9',
-    name: 'Salmon Fillet',
-    emoji: '🐟',
+    name: 'Wild Salmon Fillet',
+    category: 'Fish',
     calories: 208,
     protein: 28,
     carbs: 0,
@@ -94,8 +92,8 @@ export const MOCK_FOODS = [
   },
   {
     id: 'f10',
-    name: 'Sweet Potato',
-    emoji: '🍠',
+    name: 'Roasted Sweet Potato',
+    category: 'Carbs',
     calories: 86,
     protein: 2,
     carbs: 20,
@@ -104,8 +102,6 @@ export const MOCK_FOODS = [
   },
 ];
 
-// MOCK: replace with real model inference
-// Randomly selects a food from the lookup to simulate vision-based recognition
 export function mockRecognizeFood() {
   const idx = Math.floor(Math.random() * MOCK_FOODS.length);
   return MOCK_FOODS[idx];

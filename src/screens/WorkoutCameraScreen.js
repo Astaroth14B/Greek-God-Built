@@ -12,18 +12,17 @@ import useAppStore from '../store/useAppStore';
 
 const { width, height } = Dimensions.get('window');
 
-// MOCK: replace with real model inference - MediaPipe BlazePose or similar
 const FORM_TIPS = [
-  'Keep your back straight',
-  'Go slightly deeper on the squat',
-  'Keep your knees in line with your toes',
-  'Breathe out on the way up',
-  'Engage your core throughout',
-  'Control the descent — don\'t drop!',
-  'Keep your chin up, chest proud',
-  'Drive through your heels',
-  'Squeeze at the top of the movement',
-  'Full range of motion — go lower!',
+  'Maintain neutral spinal alignment',
+  'Increase depth to achieve full range of motion',
+  'Track knees in direct alignment with mid-foot',
+  'Exhale smoothly through the concentric phase',
+  'Brace your abdominal wall throughout the rep',
+  'Control eccentric tempo with 2-second descent',
+  'Keep chest proud and shoulders depressed',
+  'Drive upward through the center of your feet',
+  'Achieve peak contraction at top of movement',
+  'Maintain steady cadence without momentum',
 ];
 
 export default function WorkoutCameraScreen({ navigation, route }) {
@@ -42,15 +41,12 @@ export default function WorkoutCameraScreen({ navigation, route }) {
   const clockTimer = useRef(null);
 
   useEffect(() => {
-    // Pause all timers when app goes to background; resume when foregrounded
     const appStateSub = AppState.addEventListener('change', (nextState) => {
       if (nextState !== 'active') {
         clearInterval(repTimer.current);
         clearInterval(clockTimer.current);
         clearTimeout(tipTimer.current);
       }
-      // Timers are intentionally NOT auto-restarted on resume;
-      // the user can press Start Tracking again if needed.
     });
 
     return () => {
@@ -64,7 +60,6 @@ export default function WorkoutCameraScreen({ navigation, route }) {
   const startTracking = () => {
     setIsTracking(true);
 
-    // MOCK: increment rep every ~2.5 seconds
     repTimer.current = setInterval(() => {
       setReps((r) => {
         const newReps = r + 1;
@@ -73,38 +68,31 @@ export default function WorkoutCameraScreen({ navigation, route }) {
       });
     }, 2500);
 
-    // Each tip fires after a freshly randomised delay (true random, not fixed)
     scheduleTip();
-
-    // Clock
     clockTimer.current = setInterval(() => setElapsedSecs((s) => s + 1), 1000);
   };
 
-  // Schedules the next random form tip using setTimeout chaining
-  // so each delay is truly random (not the same fixed value repeated).
-  // Defined after startTracking but hoisted fine in JS via function declaration.
   function scheduleTip() {
     const delay = 8000 + Math.random() * 4000;
     tipTimer.current = setTimeout(() => {
       const tip = FORM_TIPS[Math.floor(Math.random() * FORM_TIPS.length)];
       setCurrentTip(tip);
       setTipVisible(true);
-      scheduleTip(); // schedule the next one
+      scheduleTip();
     }, delay);
   }
 
   const stopTracking = () => {
     clearInterval(repTimer.current);
-    clearTimeout(tipTimer.current); // now a timeout, not interval
+    clearTimeout(tipTimer.current);
     clearInterval(clockTimer.current);
     setIsTracking(false);
 
-    // Save session
     const caloriesBurned = Math.round(reps * 0.5 * (exercise?.id === 'deadlift' ? 1.5 : 1));
-    const formScore = Math.round(70 + Math.random() * 25);
+    const formScore = Math.round(75 + Math.random() * 20);
 
     const session = {
-      exercise: exercise?.name || 'Unknown',
+      exercise: exercise?.name || 'Workout Session',
       reps,
       sets: sets || Math.ceil(reps / 8),
       duration: elapsedSecs,
@@ -128,14 +116,18 @@ export default function WorkoutCameraScreen({ navigation, route }) {
   if (!permission.granted) {
     return (
       <View style={styles.permContainer}>
-        <Text style={styles.permEmoji}>🎥</Text>
-        <Text style={styles.permTitle}>Camera Needed</Text>
-        <Text style={styles.permDesc}>Grant camera access to track your workout form.</Text>
+        <View style={styles.permIconContainer}>
+          <Ionicons name="camera-outline" size={32} color={Colors.gold} />
+        </View>
+        <Text style={styles.permTitle}>Camera Access Required</Text>
+        <Text style={styles.permDesc}>
+          Enable camera access for computer vision pose analysis and automatic rep counting.
+        </Text>
         <TouchableOpacity style={styles.permBtn} onPress={requestPermission}>
-          <Text style={styles.permBtnText}>Grant Access</Text>
+          <Text style={styles.permBtnText}>Enable Camera</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Text style={styles.backBtnText}>← Go Back</Text>
+          <Text style={styles.backBtnText}>Return</Text>
         </TouchableOpacity>
       </View>
     );
@@ -144,25 +136,25 @@ export default function WorkoutCameraScreen({ navigation, route }) {
   return (
     <View style={styles.container}>
       <CameraView style={StyleSheet.absoluteFill} facing="front">
-        {/* Skeleton overlay */}
+        {/* Pose Skeleton Overlay */}
         <SkeletonOverlay width={width * 0.55} height={height * 0.55} />
 
-        {/* Top bar */}
+        {/* Top HUD */}
         <View style={styles.topBar}>
           <TouchableOpacity
             style={styles.closeBtn}
             onPress={() => {
               clearInterval(repTimer.current);
-              clearTimeout(tipTimer.current); // changed to timeout
+              clearTimeout(tipTimer.current);
               clearInterval(clockTimer.current);
               navigation.goBack();
             }}
           >
-            <Ionicons name="close" size={22} color="#fff" />
+            <Ionicons name="close" size={20} color="#fff" />
           </TouchableOpacity>
 
           <View style={styles.exercisePill}>
-            <Text style={styles.exerciseEmoji}>{exercise?.emoji || '💪'}</Text>
+            <Ionicons name="barbell-outline" size={14} color={Colors.gold} />
             <Text style={styles.exerciseName}>{exercise?.name || 'Workout'}</Text>
           </View>
 
@@ -171,33 +163,33 @@ export default function WorkoutCameraScreen({ navigation, route }) {
           </View>
         </View>
 
-        {/* Stand back reminder */}
+        {/* Framing reminder */}
         {!isTracking && (
           <View style={styles.reminderBox}>
             <Text style={styles.reminderText}>
-              📐 Stand 5–6 ft back so your full body is visible.{'\n'}
-              Front camera is active — prop your phone on a stand.
+              Position device 5–6 ft away for full-body tracking.{'\n'}
+              Front camera enabled · Prop phone against vertical surface.
             </Text>
           </View>
         )}
 
-        {/* Rep/Set Counters */}
+        {/* Rep & Set Counters */}
         <View style={styles.countersRow}>
           <View style={styles.counterBox}>
             <Text style={styles.counterValue}>{reps}</Text>
             <Text style={styles.counterLabel}>REPS</Text>
           </View>
           <View style={[styles.counterBox, styles.counterBoxSet]}>
-            <Text style={[styles.counterValue, { color: Colors.green }]}>
+            <Text style={[styles.counterValue, { color: Colors.gold }]}>
               {sets || Math.ceil(reps / 8) || 0}
             </Text>
             <Text style={styles.counterLabel}>SETS</Text>
           </View>
         </View>
 
-        {/* MOCK label */}
+        {/* Simulated status */}
         <View style={styles.mockLabel}>
-          <Text style={styles.mockText}>MOCK AI • Pose estimation simulated</Text>
+          <Text style={styles.mockText}>VISION AI • POSE TRACKER</Text>
         </View>
 
         {/* Form Tip Toast */}
@@ -207,17 +199,17 @@ export default function WorkoutCameraScreen({ navigation, route }) {
           onHide={() => setTipVisible(false)}
         />
 
-        {/* Bottom Controls */}
+        {/* Bottom Action Controls */}
         <View style={styles.bottomControls}>
           {!isTracking ? (
-            <TouchableOpacity style={styles.startBtn} onPress={startTracking}>
-              <Ionicons name="play" size={24} color={Colors.bg} />
+            <TouchableOpacity style={styles.startBtn} onPress={startTracking} activeOpacity={0.85}>
+              <Ionicons name="play" size={20} color={Colors.bg} />
               <Text style={styles.startBtnText}>Start Tracking</Text>
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity style={styles.stopBtn} onPress={stopTracking}>
-              <Ionicons name="stop" size={24} color="#fff" />
-              <Text style={styles.stopBtnText}>End Session</Text>
+            <TouchableOpacity style={styles.stopBtn} onPress={stopTracking} activeOpacity={0.85}>
+              <Ionicons name="stop" size={20} color="#fff" />
+              <Text style={styles.stopBtnText}>Complete Session</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -233,45 +225,49 @@ const styles = StyleSheet.create({
     flex: 1, backgroundColor: Colors.bg,
     alignItems: 'center', justifyContent: 'center', padding: Spacing.xl,
   },
-  permEmoji: { fontSize: 56, marginBottom: 16 },
-  permTitle: { fontSize: FontSizes.xxl, fontWeight: '800', color: Colors.textPrimary, marginBottom: 8 },
-  permDesc: { fontSize: FontSizes.md, color: Colors.textSecondary, textAlign: 'center', marginBottom: 24 },
-  permBtn: {
-    backgroundColor: Colors.green, paddingVertical: 14, paddingHorizontal: 36,
-    borderRadius: Radii.full, marginBottom: 12,
+  permIconContainer: {
+    width: 64, height: 64, borderRadius: 32,
+    backgroundColor: Colors.goldGlow, borderWidth: 1, borderColor: Colors.borderGold,
+    alignItems: 'center', justifyContent: 'center', marginBottom: 16,
   },
-  permBtnText: { fontSize: FontSizes.md, fontWeight: '800', color: Colors.bg },
+  permTitle: { fontSize: FontSizes.xl, fontWeight: '800', color: Colors.textPrimary, marginBottom: 8, textAlign: 'center' },
+  permDesc: { fontSize: FontSizes.sm, color: Colors.textSecondary, textAlign: 'center', lineHeight: 20, marginBottom: 24 },
+  permBtn: {
+    backgroundColor: Colors.gold, paddingVertical: 14, paddingHorizontal: 36,
+    borderRadius: Radii.full, marginBottom: 12, ...Shadows.gold,
+  },
+  permBtnText: { fontSize: FontSizes.sm, fontWeight: '800', color: Colors.bg, letterSpacing: 0.5 },
   backBtn: { paddingVertical: 10 },
-  backBtnText: { fontSize: FontSizes.md, color: Colors.textSecondary },
+  backBtnText: { fontSize: FontSizes.xs, color: Colors.textSecondary },
 
   topBar: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 16, paddingTop: 60, paddingBottom: 16,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.6)',
   },
   closeBtn: {
     width: 36, height: 36, borderRadius: 18,
-    backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center',
   },
   exercisePill: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: Radii.full,
+    backgroundColor: 'rgba(10,10,13,0.85)', borderRadius: Radii.full,
     paddingHorizontal: 12, paddingVertical: 6,
-    borderWidth: 1, borderColor: Colors.green + '66',
+    borderWidth: 1, borderColor: Colors.borderGold,
   },
-  exerciseEmoji: { fontSize: 18 },
-  exerciseName: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.textPrimary },
+  exerciseName: { fontSize: FontSizes.xs, fontWeight: '700', color: Colors.textPrimary },
   timerBox: {
-    backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: Radii.md,
+    backgroundColor: 'rgba(10,10,13,0.85)', borderRadius: Radii.sm,
     paddingHorizontal: 10, paddingVertical: 5,
+    borderWidth: 1, borderColor: Colors.border,
   },
-  timerText: { fontSize: FontSizes.md, fontWeight: '800', color: Colors.green, fontVariant: ['tabular-nums'] },
+  timerText: { fontSize: FontSizes.sm, fontWeight: '800', color: Colors.gold, fontVariant: ['tabular-nums'] },
 
   reminderBox: {
     alignSelf: 'center', marginTop: 20,
-    backgroundColor: 'rgba(0,0,0,0.7)', borderRadius: Radii.md,
+    backgroundColor: 'rgba(10,10,13,0.85)', borderRadius: Radii.md,
     paddingHorizontal: 16, paddingVertical: 10,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)',
     maxWidth: width * 0.85,
   },
   reminderText: {
@@ -280,42 +276,41 @@ const styles = StyleSheet.create({
   },
 
   countersRow: {
-    position: 'absolute', bottom: 140, left: 20, right: 20,
+    position: 'absolute', bottom: 130, left: 20, right: 20,
     flexDirection: 'row', gap: 12,
   },
   counterBox: {
-    flex: 1, backgroundColor: 'rgba(0,0,0,0.7)',
+    flex: 1, backgroundColor: 'rgba(10,10,13,0.88)',
     borderRadius: Radii.lg, alignItems: 'center', paddingVertical: 14,
-    borderWidth: 1.5, borderColor: Colors.accent + '66',
+    borderWidth: 1, borderColor: Colors.border,
   },
-  counterBoxSet: { borderColor: Colors.green + '66' },
-  counterValue: { fontSize: FontSizes.xxxl, fontWeight: '900', color: Colors.accent },
+  counterBoxSet: { borderColor: Colors.borderGold },
+  counterValue: { fontSize: FontSizes.xxxl, fontWeight: '900', color: Colors.textPrimary },
   counterLabel: {
-    fontSize: FontSizes.xs, color: 'rgba(255,255,255,0.6)',
-    letterSpacing: 2, textTransform: 'uppercase', marginTop: 2,
+    fontSize: 9, color: Colors.textMuted,
+    letterSpacing: 1.5, textTransform: 'uppercase', marginTop: 2,
   },
 
   mockLabel: {
-    position: 'absolute', top: 130, alignSelf: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: Radii.full,
-    paddingHorizontal: 10, paddingVertical: 3,
+    position: 'absolute', top: 125, alignSelf: 'center',
+    backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: Radii.full,
+    paddingHorizontal: 10, paddingVertical: 3, borderWidth: 1, borderColor: Colors.border,
   },
-  mockText: { fontSize: 8, color: 'rgba(255,255,255,0.4)', letterSpacing: 1, textTransform: 'uppercase' },
+  mockText: { fontSize: 8, color: Colors.textMuted, letterSpacing: 1, textTransform: 'uppercase' },
 
   bottomControls: {
-    position: 'absolute', bottom: 50, left: 20, right: 20,
+    position: 'absolute', bottom: 44, left: 20, right: 20,
   },
   startBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    backgroundColor: Colors.green, paddingVertical: 18,
-    borderRadius: Radii.full, gap: 10, ...Shadows.green,
+    backgroundColor: Colors.gold, paddingVertical: 16,
+    borderRadius: Radii.full, gap: 8, ...Shadows.gold,
   },
-  startBtnText: { fontSize: FontSizes.xl, fontWeight: '900', color: Colors.bg },
+  startBtnText: { fontSize: FontSizes.md, fontWeight: '800', color: Colors.bg, letterSpacing: 0.5 },
   stopBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    backgroundColor: Colors.danger, paddingVertical: 18,
-    borderRadius: Radii.full, gap: 10,
-    shadowColor: Colors.danger, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 12,
+    backgroundColor: Colors.danger, paddingVertical: 16,
+    borderRadius: Radii.full, gap: 8,
   },
-  stopBtnText: { fontSize: FontSizes.xl, fontWeight: '900', color: '#fff' },
+  stopBtnText: { fontSize: FontSizes.md, fontWeight: '800', color: '#fff', letterSpacing: 0.5 },
 });

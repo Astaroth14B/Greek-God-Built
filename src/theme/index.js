@@ -1,52 +1,52 @@
-// Greek God Build — Mythic Divine Design Tokens
+// Project Zeus — Minimalist Black, White & Gold Design System
 export const Colors = {
-  // Mythic Dark Obsidian Backgrounds
-  bg: '#08080C',
-  bgCard: '#11111B',
-  bgElevated: '#1A1A28',
-  bgInput: '#161624',
+  // Deep Obsidian Matte Backgrounds
+  bg: '#0A0A0D',
+  bgCard: '#131318',
+  bgElevated: '#1B1B22',
+  bgInput: '#15151B',
 
-  // Olympian Gold Accent
-  gold: '#FFD700',
-  goldDim: '#D4AF37',
-  goldGlow: 'rgba(255, 215, 0, 0.2)',
-  goldLight: '#FFF3B0',
+  // Refined Olympic Gold
+  gold: '#D4AF37',
+  goldDim: '#997D2A',
+  goldLight: '#F3E5A8',
+  goldGlow: 'rgba(212, 175, 55, 0.12)',
 
-  // Lightning Cyan / Electric Blue (Zeus Thunderbolt)
-  accent: '#00E5FF',
-  accentDim: '#00B4D8',
-  accentGlow: 'rgba(0, 229, 255, 0.22)',
-  accentDeep: '#0077B6',
+  // Primary Accent (Aligned to Gold)
+  accent: '#D4AF37',
+  accentDim: '#A8872B',
+  accentGlow: 'rgba(212, 175, 55, 0.12)',
+  accentDeep: '#5C4A19',
 
-  // Spartan Laurel Green (for Vitality, Streaks, Success)
-  green: '#00E676',
-  greenDim: '#00C853',
-  greenGlow: 'rgba(0, 230, 118, 0.2)',
-
-  // Apollo Solar Orange / Fire
-  orange: '#FF6D00',
-  orangeDim: '#E65100',
-  orangeGlow: 'rgba(255, 109, 0, 0.2)',
-
-  // Ares Royal Purple / Carbs
-  purple: '#B388FF',
-  purpleDim: '#7C4DFF',
-
-  // Marble & Titanium Texts
+  // Monochrome Scale
+  white: '#FFFFFF',
   textPrimary: '#FFFFFF',
-  textSecondary: '#A0AAB8',
-  textMuted: '#525B6C',
+  textSecondary: '#9EA4B0',
+  textMuted: '#5D6370',
 
-  // Divine Borders
-  border: 'rgba(255, 255, 255, 0.1)',
-  borderGold: 'rgba(255, 215, 0, 0.35)',
-  borderAccent: 'rgba(0, 229, 255, 0.35)',
+  // Subtle Organic Accent Tones (Understated, never neon)
+  green: '#8FB986',      // Laurel leaf sage
+  greenDim: '#648A5C',
+  greenGlow: 'rgba(143, 185, 134, 0.12)',
 
-  // Danger
-  danger: '#FF3B30',
+  orange: '#C88D62',     // Terracotta
+  orangeDim: '#9A6640',
+  orangeGlow: 'rgba(200, 141, 98, 0.12)',
 
-  // Tab bar
-  tabBar: '#0A0A12',
+  purple: '#9B93B8',     // Muted slate amethyst
+  purpleDim: '#6F668E',
+
+  // Minimalist Borders
+  border: 'rgba(255, 255, 255, 0.08)',
+  borderLight: 'rgba(255, 255, 255, 0.14)',
+  borderGold: 'rgba(212, 175, 55, 0.35)',
+  borderAccent: 'rgba(212, 175, 55, 0.35)',
+
+  // Alert
+  danger: '#D96B6B',
+
+  // Navigation
+  tabBar: '#0B0B0E',
 };
 
 export const FontSizes = {
@@ -56,8 +56,8 @@ export const FontSizes = {
   lg: 17,
   xl: 20,
   xxl: 26,
-  xxxl: 34,
-  display: 44,
+  xxxl: 32,
+  display: 40,
 };
 
 export const Spacing = {
@@ -70,40 +70,40 @@ export const Spacing = {
 };
 
 export const Radii = {
-  sm: 8,
-  md: 14,
-  lg: 20,
-  xl: 28,
+  sm: 6,
+  md: 12,
+  lg: 18,
+  xl: 24,
   full: 999,
 };
 
 export const Shadows = {
   card: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.6,
-    shadowRadius: 14,
-    elevation: 8,
-  },
-  accent: {
-    shadowColor: '#00E5FF',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 18,
-    elevation: 12,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 4,
   },
   gold: {
-    shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.55,
-    shadowRadius: 20,
-    elevation: 14,
+    shadowColor: '#D4AF37',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 6,
+  },
+  accent: {
+    shadowColor: '#D4AF37',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 6,
   },
   green: {
-    shadowColor: '#00E676',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 16,
-    elevation: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
 };

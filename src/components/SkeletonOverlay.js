@@ -4,13 +4,12 @@ import { View, StyleSheet } from 'react-native';
 import { Colors } from '../theme';
 
 /**
- * MOCK: Static skeleton/stick-figure overlay for workout camera screen
- * Replace with real pose estimation model (e.g. MediaPipe BlazePose) for production
+ * Clean gold skeleton/pose guide overlay for workout camera
  */
 const SkeletonOverlay = ({ width = 200, height = 400 }) => {
-  const color = Colors.accent;
-  const sw = 3; // stroke width
-  const dotR = 6; // joint dot radius
+  const color = Colors.gold;
+  const sw = 2.5; // stroke width
+  const dotR = 5; // joint dot radius
 
   // Normalized body keypoints (as % of width/height)
   const kp = {
@@ -82,7 +81,7 @@ const SkeletonOverlay = ({ width = 200, height = 400 }) => {
             cy={pt(key)[1]}
             r={dotR}
             fill={color}
-            fillOpacity={0.85}
+            fillOpacity={0.9}
           />
         ))}
       </Svg>

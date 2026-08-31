@@ -1,86 +1,78 @@
-# ⚡ GREEK GOD BUILD 🔱
+# Project Zeus
 
 <p align="center">
-  <img src="./assets/logo.png" alt="Greek God Build Logo" width="180" style="border-radius: 90px;"/>
+  <img src="./assets/logo.png" alt="Project Zeus Logo" width="180" style="border-radius: 90px;"/>
 </p>
 
 <p align="center">
-  <b>AI-Powered Cross-Platform Mobile Fitness App Prototype</b><br/>
-  <i>Built with React Native, Expo, and Zustand</i>
+  <b>AI-Powered Cross-Platform Mobile Fitness & Nutrition App Prototype</b><br/>
+  <i>Built with React Native, Expo SDK 57, and Zustand</i>
 </p>
 
 ---
 
-## 🏛️ Overview
+## Overview
 
-**Greek God Build** is a demo-ready mobile fitness application prototype engineered for pitch presentations and rapid iteration. Built on **Expo SDK 57**, the app works 100% reliably offline using client-side mock AI simulation for both meal calorie scanning and real-time workout form coaching.
+**Project Zeus** is a mobile fitness and nutrition application prototype engineered for intuitive fitness tracking and rapid iteration. Built on **Expo SDK 57**, the app works 100% reliably offline using client-side mock AI simulation for both meal calorie scanning and real-time workout form coaching with a minimalist **Black, White & Gold** aesthetic.
 
 ---
 
-## ⚡ Core Features & Screens
+## Core Features & Screens
 
-1. **🏛️ Mythic Onboarding & Olympian Assessment**
+1. **Onboarding & Fitness Assessment**
    - Collects personal vitals (Age, Sex, Height, Weight, Activity Level, Fitness Goal).
    - Computes Mifflin-St Jeor BMR, TDEE, BMI, and daily calorie + macro targets (Protein, Carbs, Fat).
 
-2. **⚡ Olympus Dashboard**
-   - Dynamic SVG calorie donut ring (consumed vs. target).
+2. **Overview Dashboard**
+   - Clean circular calorie progress ring (consumed vs. target).
    - Macro nutrient progress indicators (Protein, Carbs, Healthy Fats).
-   - Spartan step counter (with simulated sensor fallback).
-   - Divine streak tracker with rank progression (Mortal ➔ Spartan ➔ Titan ➔ Olympian).
+   - Daily step counter (with simulated sensor fallback).
+   - Daily streak tracker and consistency milestones.
 
-3. **📷 Ambrosia AI Vision Calorie Scanner (Mocked)**
+3. **AI Vision Calorie Scanner (Mocked)**
    - Live camera viewfinder using `expo-camera`.
-   - Simulated AI scan delay & instant nutrient estimation from local food lookup.
-   - User editing & one-tap addition to daily fuel log.
+   - Simulated computer vision portion & nutrition estimation.
+   - User editing & one-tap addition to daily food log.
 
-4. **🏋️ Titan AI Workout & Pose Form Tracker (Mocked)**
+4. **AI Workout & Form Tracker (Mocked)**
    - Front-camera posture tracker with stick-figure skeleton overlay.
    - Real-time cadence rep/set counter.
    - Dynamic coach form tip toasts (e.g., *"Keep your back straight"*, *"Drive through heels"*).
-   - End-of-session divine breakdown: Reps, Sets, Kcal burned, and Form Score.
+   - Post-workout form score breakdown & focus points.
 
-5. **🥗 Olympian Feast Meal Plans**
-   - Goal-filtered (Bulk / Cut / Maintain) and diet-filtered (Non-Veg, Veg, Vegan, Keto) meal plans.
-   - Expandable meal cards with complete macro breakdowns.
+5. **Curated Nutrition & Meal Plans**
+   - Personalized meal suggestions for Bulk, Cut, and Maintenance goals.
+   - Dietary filter support: Standard, Vegetarian, Vegan, Keto.
+   - Complete macro breakdowns for Breakfast, Lunch, Dinner, and Snacks.
 
-6. **🩺 Olympus Council (Master Professionals Marketplace)**
-   - Directory of certified trainers, dietitians, and sports doctors.
-   - Slot booking flow, price summary, and instant booking confirmation.
+6. **Verified Coaches Marketplace**
+   - Browse certified trainers, nutritionists, and sports medicine doctors.
+   - Filter by specialty, view ratings, reviews, and rates.
+   - Interactive time-slot booking flow with instant confirmation.
 
 ---
 
-## 🚀 Getting Started
+## Quick Start
 
-### 1. Prerequisites
+### Prerequisites
 - Node.js (v18+)
-- [Expo Go](https://expo.dev/go) app on your iOS or Android device
+- Expo CLI (`npm install -g expo-cli` or via `npx expo`)
+- Expo Go app on iOS/Android (optional, for physical device testing)
 
-### 2. Installation
+### Installation & Run
+
 ```bash
-cd greek-god-build
+# Install dependencies
 npm install
-```
 
-### 3. Run the App
-```bash
+# Start the Expo development server
 npx expo start
 ```
-- Scan the QR code in your terminal using the **Expo Go** camera on Android or iOS Camera app.
-- Or press `a` for Android Emulator / `w` for Web preview.
+
+Press `a` for Android Emulator, `i` for iOS Simulator, or scan the QR code using the **Expo Go** app on your physical device.
 
 ---
 
-## 🛠️ Architecture & Tech Stack
+## License
 
-- **Framework**: Expo (SDK 57) / React Native
-- **Navigation**: React Navigation v6 (Native Stack + Bottom Tabs)
-- **State Management**: Zustand
-- **Graphics**: `react-native-svg`
-- **Sensors & Hardware**: `expo-camera`, `expo-sensors` (Pedometer)
-- **Icons**: `@expo/vector-icons` (Ionicons & MaterialCommunityIcons)
-
----
-
-## 📜 License
-MIT License. Built for the Greek God Build Pitch Demo.
+MIT License.

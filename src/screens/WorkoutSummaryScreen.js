@@ -5,19 +5,13 @@ import {
 } from 'react-native';
 import { Colors, FontSizes, Spacing, Radii, Shadows } from '../theme';
 import { Ionicons } from '@expo/vector-icons';
-
-const SCORE_COLORS = (score) => {
-  if (score >= 90) return Colors.green;
-  if (score >= 75) return Colors.accent;
-  if (score >= 60) return Colors.orange;
-  return Colors.danger;
-};
+import Card from '../components/Card';
 
 const SCORE_LABELS = (score) => {
-  if (score >= 90) return 'Excellent! 🏆';
-  if (score >= 75) return 'Great Form! ✅';
-  if (score >= 60) return 'Room to Improve 📈';
-  return 'Needs Work 🔧';
+  if (score >= 90) return 'Optimal Biomechanics';
+  if (score >= 75) return 'Consistent Form';
+  if (score >= 60) return 'Technique Needs Adjustment';
+  return 'Review Motion Path';
 };
 
 export default function WorkoutSummaryScreen({ navigation, route }) {
@@ -26,12 +20,11 @@ export default function WorkoutSummaryScreen({ navigation, route }) {
   const scoreAnim = useRef(new Animated.Value(0)).current;
 
   const score = session?.formScore || 82;
-  const scoreColor = SCORE_COLORS(score);
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
-      Animated.timing(scoreAnim, { toValue: score / 100, duration: 1200, useNativeDriver: false }),
+      Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true }),
+      Animated.timing(scoreAnim, { toValue: score / 100, duration: 1000, useNativeDriver: false }),
     ]).start();
   }, []);
 
@@ -50,44 +43,49 @@ export default function WorkoutSummaryScreen({ navigation, route }) {
     >
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.emoji}>🎉</Text>
-        <Text style={styles.title}>Session Complete!</Text>
-        <Text style={styles.exerciseName}>{session?.exercise || 'Workout'}</Text>
+        <View style={styles.badgeContainer}>
+          <Ionicons name="checkmark-circle-outline" size={16} color={Colors.gold} />
+          <Text style={styles.badgeText}>SESSION COMPLETE</Text>
+        </View>
+        <Text style={styles.title}>{session?.exercise || 'Workout Session'}</Text>
+        <Text style={styles.date}>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</Text>
       </View>
 
-      {/* Form Score Ring */}
-      <View style={[styles.scoreCard, { borderColor: scoreColor + '55' }]}>
-        <Text style={styles.scoreLabel}>Form Score</Text>
-        <Text style={[styles.scoreValue, { color: scoreColor }]}>{score}</Text>
-        <Text style={styles.scoreMax}>/100</Text>
-        <Text style={[styles.scoreVerdict, { color: scoreColor }]}>{SCORE_LABELS(score)}</Text>
+      {/* Form Score Card */}
+      <Card style={styles.scoreCard} highlighted>
+        <Text style={styles.scoreLabel}>BIOMECHANICAL ACCURACY SCORE</Text>
+        <Text style={styles.scoreValue}>{score}</Text>
+        <Text style={styles.scoreMax}>out of 100</Text>
+        <Text style={styles.scoreVerdict}>{SCORE_LABELS(score)}</Text>
 
-        {/* Score bar */}
+        {/* Score track */}
         <View style={styles.scoreTrack}>
           <Animated.View
             style={[
               styles.scoreFill,
               {
                 width: scoreAnim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }),
-                backgroundColor: scoreColor,
+                backgroundColor: Colors.gold,
               },
             ]}
           />
         </View>
-        <Text style={styles.mockBadge}>MOCK • AI Form Analysis Simulated</Text>
-      </View>
+        <Text style={styles.mockBadge}>COMPUTER VISION ESTIMATION</Text>
+      </Card>
 
       {/* Stats Grid */}
       <View style={styles.statsGrid}>
         {[
-          { label: 'Total Reps', value: session?.reps || 0, icon: '🔁', color: Colors.accent },
-          { label: 'Sets', value: session?.sets || 0, icon: '💪', color: Colors.green },
-          { label: 'Duration', value: formatDuration(session?.duration), icon: '⏱️', color: Colors.purple },
-          { label: 'Calories', value: session?.caloriesBurned || 0, icon: '🔥', color: Colors.orange, unit: 'kcal' },
+          { label: 'Total Reps', value: session?.reps || 0, icon: 'repeat-outline' },
+          { label: 'Completed Sets', value: session?.sets || 0, icon: 'layers-outline' },
+          { label: 'Time Under Tension', value: formatDuration(session?.duration), icon: 'time-outline' },
+          { label: 'Energy Expended', value: session?.caloriesBurned || 0, icon: 'flame-outline', unit: 'kcal' },
         ].map((stat) => (
-          <View key={stat.label} style={[styles.statCard, { borderColor: stat.color + '44' }]}>
-            <Text style={styles.statIcon}>{stat.icon}</Text>
-            <Text style={[styles.statValue, { color: stat.color }]}>
+          <View key={stat.label} style={styles.statCard}>
+            <View style={styles.statIconContainer}>
+              <Ionicons name={stat.icon} size={16} color={Colors.gold} />
+            </View>
+            <Text style={styles.statValue}>
               {stat.value}
             </Text>
             {stat.unit && <Text style={styles.statUnit}>{stat.unit}</Text>}
@@ -96,44 +94,37 @@ export default function WorkoutSummaryScreen({ navigation, route }) {
         ))}
       </View>
 
-      {/* Form Tips from Session */}
-      <View style={styles.tipsCard}>
-        <Text style={styles.tipsTitle}>💡 Focus Points for Next Session</Text>
+      {/* Form Analysis Focus Points */}
+      <Card style={styles.tipsCard}>
+        <Text style={styles.tipsTitle}>TECHNIQUE REFINEMENT TARGETS</Text>
         {[
-          'Keep your core braced throughout the movement',
-          'Work on your range of motion — aim to go deeper',
-          'Control the eccentric (lowering) phase more deliberately',
+          'Maintain intra-abdominal brace through the bottom transition',
+          'Ensure continuous knee-toe tracking alignment under load',
+          'Eliminate momentum during initial ascent to maximize muscle tension',
         ].map((tip, i) => (
           <View key={i} style={styles.tipRow}>
             <View style={styles.tipBullet} />
             <Text style={styles.tipText}>{tip}</Text>
           </View>
         ))}
-      </View>
-
-      {/* Streak boost */}
-      <View style={styles.streakBoost}>
-        <Text style={styles.streakBoostEmoji}>🔥</Text>
-        <View>
-          <Text style={styles.streakBoostTitle}>Streak Extended!</Text>
-          <Text style={styles.streakBoostSub}>Your gym streak grows stronger every session.</Text>
-        </View>
-      </View>
+      </Card>
 
       {/* Actions */}
       <TouchableOpacity
         style={styles.doneBtn}
         onPress={() => navigation.navigate('WorkoutTab')}
+        activeOpacity={0.85}
       >
-        <Text style={styles.doneBtnText}>Back to Workouts</Text>
+        <Text style={styles.doneBtnText}>Return to Workouts</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.homeBtn}
         onPress={() => navigation.navigate('HomeTab')}
+        activeOpacity={0.8}
       >
-        <Ionicons name="home" size={18} color={Colors.textSecondary} />
-        <Text style={styles.homeBtnText}>Go to Dashboard</Text>
+        <Ionicons name="home-outline" size={16} color={Colors.textSecondary} />
+        <Text style={styles.homeBtnText}>Go to Overview</Text>
       </TouchableOpacity>
     </Animated.ScrollView>
   );
@@ -144,21 +135,25 @@ const styles = StyleSheet.create({
   scroll: { padding: Spacing.lg, paddingTop: 60, paddingBottom: 40 },
 
   header: { alignItems: 'center', marginBottom: Spacing.lg },
-  emoji: { fontSize: 56, marginBottom: 8 },
-  title: { fontSize: FontSizes.xxxl, fontWeight: '900', color: Colors.textPrimary, marginBottom: 4 },
-  exerciseName: { fontSize: FontSizes.lg, color: Colors.accent, fontWeight: '600' },
+  badgeContainer: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    backgroundColor: Colors.goldGlow, borderRadius: Radii.full,
+    paddingHorizontal: 12, paddingVertical: 4,
+    borderWidth: 1, borderColor: Colors.borderGold, marginBottom: 8,
+  },
+  badgeText: { fontSize: 10, fontWeight: '800', color: Colors.gold, letterSpacing: 1 },
+  title: { fontSize: FontSizes.xxl, fontWeight: '800', color: Colors.textPrimary, textAlign: 'center' },
+  date: { fontSize: FontSizes.xs, color: Colors.textSecondary, marginTop: 4 },
 
   scoreCard: {
-    backgroundColor: Colors.bgCard, borderRadius: Radii.xl,
-    padding: Spacing.xl, alignItems: 'center', borderWidth: 1.5,
-    marginBottom: Spacing.md, ...Shadows.card,
+    alignItems: 'center', marginBottom: Spacing.md,
   },
-  scoreLabel: { fontSize: FontSizes.sm, color: Colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 4 },
-  scoreValue: { fontSize: 80, fontWeight: '900', lineHeight: 88 },
-  scoreMax: { fontSize: FontSizes.xl, color: Colors.textMuted, marginTop: -4 },
-  scoreVerdict: { fontSize: FontSizes.xl, fontWeight: '800', marginTop: 6 },
+  scoreLabel: { fontSize: 9, color: Colors.textSecondary, textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 6 },
+  scoreValue: { fontSize: 64, fontWeight: '900', color: Colors.gold, lineHeight: 72 },
+  scoreMax: { fontSize: FontSizes.xs, color: Colors.textMuted, marginTop: -4 },
+  scoreVerdict: { fontSize: FontSizes.sm, fontWeight: '700', color: Colors.textPrimary, marginTop: 6 },
   scoreTrack: {
-    width: '100%', height: 8, backgroundColor: Colors.bgElevated,
+    width: '100%', height: 4, backgroundColor: Colors.bgElevated,
     borderRadius: Radii.full, marginTop: 16, overflow: 'hidden',
   },
   scoreFill: { height: '100%', borderRadius: Radii.full },
@@ -169,47 +164,37 @@ const styles = StyleSheet.create({
 
   statsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: Spacing.md },
   statCard: {
-    width: '47%', backgroundColor: Colors.bgCard,
-    borderRadius: Radii.lg, padding: Spacing.md, alignItems: 'center',
-    borderWidth: 1.5, ...Shadows.card,
+    width: '48%', backgroundColor: Colors.bgCard,
+    borderRadius: Radii.md, padding: Spacing.md, alignItems: 'center',
+    borderWidth: 1, borderColor: Colors.border,
   },
-  statIcon: { fontSize: 24, marginBottom: 6 },
-  statValue: { fontSize: FontSizes.xxl, fontWeight: '900' },
-  statUnit: { fontSize: FontSizes.xs, color: Colors.textMuted },
-  statLabel: { fontSize: FontSizes.xs, color: Colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 4 },
+  statIconContainer: {
+    width: 32, height: 32, borderRadius: 16,
+    backgroundColor: Colors.goldGlow, alignItems: 'center', justifyContent: 'center',
+    marginBottom: 8, borderWidth: 1, borderColor: Colors.borderGold,
+  },
+  statValue: { fontSize: FontSizes.xl, fontWeight: '800', color: Colors.textPrimary },
+  statUnit: { fontSize: 10, color: Colors.textMuted },
+  statLabel: { fontSize: 9, color: Colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 4 },
 
-  tipsCard: {
-    backgroundColor: Colors.bgCard, borderRadius: Radii.lg,
-    padding: Spacing.md, marginBottom: Spacing.md,
-    borderWidth: 1, borderColor: Colors.borderAccent,
-  },
-  tipsTitle: { fontSize: FontSizes.md, fontWeight: '700', color: Colors.accent, marginBottom: 12 },
+  tipsCard: { marginBottom: Spacing.lg },
+  tipsTitle: { fontSize: 10, fontWeight: '700', color: Colors.textSecondary, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 12 },
   tipRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8, gap: 10 },
   tipBullet: {
-    width: 6, height: 6, borderRadius: 3,
-    backgroundColor: Colors.accent, marginTop: 7,
+    width: 5, height: 5, borderRadius: 2.5,
+    backgroundColor: Colors.gold, marginTop: 6,
   },
-  tipText: { flex: 1, fontSize: FontSizes.sm, color: Colors.textSecondary, lineHeight: 20 },
-
-  streakBoost: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    backgroundColor: Colors.orange + '15', borderRadius: Radii.lg,
-    padding: Spacing.md, marginBottom: Spacing.lg,
-    borderWidth: 1, borderColor: Colors.orange + '44',
-  },
-  streakBoostEmoji: { fontSize: 32 },
-  streakBoostTitle: { fontSize: FontSizes.md, fontWeight: '800', color: Colors.orange },
-  streakBoostSub: { fontSize: FontSizes.xs, color: Colors.textSecondary, marginTop: 2 },
+  tipText: { flex: 1, fontSize: FontSizes.xs, color: Colors.textSecondary, lineHeight: 18 },
 
   doneBtn: {
-    backgroundColor: Colors.green, paddingVertical: 16,
+    backgroundColor: Colors.gold, paddingVertical: 16,
     borderRadius: Radii.full, alignItems: 'center',
-    marginBottom: 12, ...Shadows.green,
+    marginBottom: 10, ...Shadows.gold,
   },
-  doneBtnText: { fontSize: FontSizes.lg, fontWeight: '800', color: Colors.bg },
+  doneBtnText: { fontSize: FontSizes.sm, fontWeight: '800', color: Colors.bg, letterSpacing: 0.5 },
   homeBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: 6, paddingVertical: 12,
+    gap: 6, paddingVertical: 10,
   },
-  homeBtnText: { fontSize: FontSizes.md, color: Colors.textSecondary },
+  homeBtnText: { fontSize: FontSizes.xs, color: Colors.textSecondary, fontWeight: '600' },
 });

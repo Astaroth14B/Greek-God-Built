@@ -7,11 +7,14 @@ import { Colors, FontSizes, Spacing, Radii, Shadows } from '../../theme';
 import useAppStore from '../../store/useAppStore';
 import { calcNutritionProfile } from '../../utils/nutrition';
 import { Ionicons } from '@expo/vector-icons';
+import Card from '../../components/Card';
 
-const StatCard = ({ label, value, unit, color, icon }) => (
-  <View style={[styles.statCard, { borderColor: color + '55' }]}>
-    <Text style={styles.statIcon}>{icon}</Text>
-    <Text style={[styles.statValue, { color }]}>{value}</Text>
+const StatCard = ({ label, value, unit, icon }) => (
+  <View style={styles.statCard}>
+    <View style={styles.statIconContainer}>
+      <Ionicons name={icon} size={15} color={Colors.gold} />
+    </View>
+    <Text style={styles.statValue}>{value}</Text>
     <Text style={styles.statUnit}>{unit}</Text>
     <Text style={styles.statLabel}>{label}</Text>
   </View>
@@ -21,21 +24,16 @@ export default function SummaryScreen({ navigation }) {
   const { profile, setNutrition, completeOnboarding } = useAppStore();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  // Compute once at mount and persist to the store immediately
   const result = useRef(calcNutritionProfile(profile)).current;
 
   useEffect(() => {
     setNutrition(result);
-    Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }).start();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run once — profile is finalized before this screen mounts
+    Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true }).start();
+  }, []);
 
   const handleStart = () => {
     completeOnboarding();
   };
-
-  const goalColors = { bulk: Colors.green, cut: Colors.orange, maintain: Colors.accent };
-  const goalColor = goalColors[profile.goal] || Colors.accent;
 
   const macroTotal = result.macros.protein * 4 + result.macros.carbs * 4 + result.macros.fat * 9;
 
@@ -55,60 +53,63 @@ export default function SummaryScreen({ navigation }) {
             </React.Fragment>
           ))}
         </View>
-        <Text style={styles.greeting}>Here's your plan,</Text>
-        <Text style={styles.name}>{profile.name || 'Champion'} 🏆</Text>
+        <Text style={styles.stepLabel}>STEP 3 OF 3 · COMPLETE</Text>
+        <Text style={styles.greeting}>Calibrated Protocol For</Text>
+        <Text style={styles.name}>{profile.name || 'Athlete'}</Text>
       </View>
 
       {/* BMI Card */}
-      <View style={[styles.bmiCard, { borderColor: goalColor + '44' }]}>
+      <Card style={styles.bmiCard} highlighted>
         <View>
-          <Text style={styles.bmiLabel}>Body Mass Index</Text>
-          <Text style={[styles.bmiValue, { color: goalColor }]}>{result.bmi}</Text>
+          <Text style={styles.bmiLabel}>BODY MASS INDEX</Text>
+          <Text style={styles.bmiValue}>{result.bmi}</Text>
           <Text style={styles.bmiCategory}>{result.bmiCategory}</Text>
         </View>
         <View style={styles.bmiStats}>
           <Text style={styles.bmiSmall}>Height: {profile.heightCm} cm</Text>
           <Text style={styles.bmiSmall}>Weight: {profile.weightKg} kg</Text>
         </View>
-      </View>
+      </Card>
 
       {/* Stats grid */}
       <View style={styles.statsGrid}>
-        <StatCard label="BMR" value={result.bmr} unit="kcal/day" color="#A855F7" icon="🔥" />
-        <StatCard label="TDEE" value={result.tdee} unit="kcal/day" color={Colors.accent} icon="⚡" />
+        <StatCard label="Basal Rate (BMR)" value={result.bmr} unit="kcal / day" icon="flame-outline" />
+        <StatCard label="Daily Burn (TDEE)" value={result.tdee} unit="kcal / day" icon="flash-outline" />
       </View>
 
       {/* Calorie target */}
-      <View style={[styles.targetCard, { borderColor: goalColor + '55' }]}>
+      <Card style={styles.targetCard} highlighted>
         <View style={styles.targetHeader}>
-          <Text style={styles.targetLabel}>Daily Calorie Target</Text>
-          <View style={[styles.goalBadge, { backgroundColor: goalColor + '20', borderColor: goalColor + '44' }]}>
-            <Text style={[styles.goalBadgeText, { color: goalColor }]}>
-              {profile.goal.toUpperCase()}
+          <Text style={styles.targetLabel}>TARGET DAILY ENERGY</Text>
+          <View style={styles.goalBadge}>
+            <Text style={styles.goalBadgeText}>
+              {profile.goal?.toUpperCase() || 'BALANCED'}
             </Text>
           </View>
         </View>
-        <Text style={[styles.targetValue, { color: goalColor }]}>
+        <Text style={styles.targetValue}>
           {result.targetCalories}
           <Text style={styles.targetUnit}> kcal</Text>
         </Text>
         {profile.goal !== 'maintain' && (
           <Text style={styles.offsetNote}>
-            {profile.goal === 'bulk' ? '↑ +400 kcal surplus' : '↓ -400 kcal deficit'} from TDEE
+            {profile.goal === 'bulk' ? '+400 kcal surplus for hypertrophy' : '-400 kcal deficit for fat reduction'}
           </Text>
         )}
-      </View>
+      </Card>
 
       {/* Macro breakdown */}
-      <Text style={styles.sectionTitle}>Macro Targets</Text>
+      <Text style={styles.sectionTitle}>MACRONUTRIENT TARGETS</Text>
       <View style={styles.macroRow}>
         {[
-          { label: 'Protein', value: result.macros.protein, color: Colors.accent, icon: '🥩' },
-          { label: 'Carbs', value: result.macros.carbs, color: Colors.purple, icon: '🍚' },
-          { label: 'Fat', value: result.macros.fat, color: Colors.orange, icon: '🥑' },
+          { label: 'Protein', value: result.macros.protein, color: Colors.gold, icon: 'fitness-outline' },
+          { label: 'Carbs', value: result.macros.carbs, color: Colors.textPrimary, icon: 'nutrition-outline' },
+          { label: 'Fat', value: result.macros.fat, color: Colors.textSecondary, icon: 'shield-checkmark-outline' },
         ].map((m) => (
           <View key={m.label} style={styles.macroCard}>
-            <Text style={styles.macroIcon}>{m.icon}</Text>
+            <View style={styles.macroIconContainer}>
+              <Ionicons name={m.icon} size={14} color={m.color} />
+            </View>
             <Text style={[styles.macroValue, { color: m.color }]}>{m.value}g</Text>
             <Text style={styles.macroLabel}>{m.label}</Text>
             <Text style={styles.macroPct}>
@@ -118,8 +119,9 @@ export default function SummaryScreen({ navigation }) {
         ))}
       </View>
 
-      <TouchableOpacity style={[styles.ctaBtn, { backgroundColor: goalColor, ...Shadows.accent }]} onPress={handleStart}>
-        <Text style={styles.ctaBtnText}>Let's Go! 🚀</Text>
+      <TouchableOpacity style={styles.ctaBtn} onPress={handleStart} activeOpacity={0.85}>
+        <Text style={styles.ctaBtnText}>Enter Dashboard</Text>
+        <Ionicons name="arrow-forward" size={18} color={Colors.bg} />
       </TouchableOpacity>
     </Animated.ScrollView>
   );
@@ -129,70 +131,81 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.bg },
   scroll: { padding: Spacing.lg, paddingTop: 60, paddingBottom: 40 },
 
-  progressRow: { flexDirection: 'row', alignItems: 'center', marginBottom: Spacing.md },
-  progressDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: Colors.bgElevated },
-  progressDone: { backgroundColor: Colors.accent },
-  progressLine: { flex: 1, height: 2, backgroundColor: Colors.border, marginHorizontal: 4 },
-  progressLineDone: { backgroundColor: Colors.accent },
+  progressRow: { flexDirection: 'row', alignItems: 'center', marginBottom: Spacing.sm },
+  progressDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.bgElevated },
+  progressDone: { backgroundColor: Colors.gold },
+  progressLine: { flex: 1, height: 1.5, backgroundColor: Colors.border, marginHorizontal: 6 },
+  progressLineDone: { backgroundColor: Colors.gold },
 
-  header: { marginBottom: Spacing.lg },
-  greeting: { fontSize: FontSizes.lg, color: Colors.textSecondary, marginBottom: 4 },
-  name: { fontSize: FontSizes.xxxl, fontWeight: '900', color: Colors.textPrimary },
+  stepLabel: {
+    fontSize: 10, color: Colors.gold, fontWeight: '800',
+    letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 6,
+  },
+  header: { marginBottom: Spacing.md },
+  greeting: { fontSize: FontSizes.xs, color: Colors.textSecondary, marginBottom: 2, textTransform: 'uppercase', letterSpacing: 0.8 },
+  name: { fontSize: FontSizes.xxl, fontWeight: '900', color: Colors.textPrimary },
 
   bmiCard: {
-    backgroundColor: Colors.bgCard, borderRadius: Radii.lg,
-    padding: Spacing.md, borderWidth: 1.5, marginBottom: Spacing.md,
+    marginBottom: Spacing.md,
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end',
-    ...Shadows.card,
   },
-  bmiLabel: { fontSize: FontSizes.xs, color: Colors.textSecondary, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 },
-  bmiValue: { fontSize: FontSizes.display, fontWeight: '900', lineHeight: 56 },
-  bmiCategory: { fontSize: FontSizes.md, color: Colors.textSecondary, fontWeight: '600' },
+  bmiLabel: { fontSize: 10, color: Colors.textSecondary, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 },
+  bmiValue: { fontSize: 44, fontWeight: '900', color: Colors.gold, lineHeight: 48 },
+  bmiCategory: { fontSize: FontSizes.xs, color: Colors.textSecondary, fontWeight: '600', marginTop: 2 },
   bmiStats: { alignItems: 'flex-end' },
-  bmiSmall: { fontSize: FontSizes.sm, color: Colors.textMuted, marginBottom: 4 },
+  bmiSmall: { fontSize: FontSizes.xs, color: Colors.textMuted, marginBottom: 2 },
 
-  statsGrid: { flexDirection: 'row', gap: 12, marginBottom: Spacing.md },
+  statsGrid: { flexDirection: 'row', gap: 10, marginBottom: Spacing.md },
   statCard: {
-    flex: 1, backgroundColor: Colors.bgCard, borderRadius: Radii.lg,
-    padding: Spacing.md, alignItems: 'center', borderWidth: 1.5, ...Shadows.card,
+    flex: 1, backgroundColor: Colors.bgCard, borderRadius: Radii.md,
+    padding: Spacing.md, alignItems: 'center', borderWidth: 1, borderColor: Colors.border,
   },
-  statIcon: { fontSize: 24, marginBottom: 6 },
-  statValue: { fontSize: FontSizes.xxl, fontWeight: '800' },
-  statUnit: { fontSize: FontSizes.xs, color: Colors.textMuted },
-  statLabel: { fontSize: FontSizes.xs, color: Colors.textSecondary, marginTop: 4, textTransform: 'uppercase', letterSpacing: 0.8 },
+  statIconContainer: {
+    width: 28, height: 28, borderRadius: 14,
+    backgroundColor: Colors.goldGlow, alignItems: 'center', justifyContent: 'center',
+    marginBottom: 6,
+  },
+  statValue: { fontSize: FontSizes.lg, fontWeight: '800', color: Colors.textPrimary },
+  statUnit: { fontSize: 10, color: Colors.textMuted },
+  statLabel: { fontSize: 9, color: Colors.textSecondary, marginTop: 4, textTransform: 'uppercase', letterSpacing: 0.5 },
 
   targetCard: {
-    backgroundColor: Colors.bgCard, borderRadius: Radii.lg,
-    padding: Spacing.lg, borderWidth: 1.5, marginBottom: Spacing.md, ...Shadows.card,
+    marginBottom: Spacing.md,
   },
   targetHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
-  targetLabel: { fontSize: FontSizes.sm, color: Colors.textSecondary, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.8 },
+  targetLabel: { fontSize: 10, color: Colors.textSecondary, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 },
   goalBadge: {
-    paddingHorizontal: 10, paddingVertical: 3,
-    borderRadius: Radii.full, borderWidth: 1,
+    paddingHorizontal: 8, paddingVertical: 2,
+    borderRadius: Radii.full, borderWidth: 1, borderColor: Colors.borderGold,
+    backgroundColor: Colors.goldGlow,
   },
-  goalBadgeText: { fontSize: FontSizes.xs, fontWeight: '800', letterSpacing: 1 },
-  targetValue: { fontSize: 52, fontWeight: '900', lineHeight: 60 },
-  targetUnit: { fontSize: FontSizes.xxl, fontWeight: '400' },
-  offsetNote: { fontSize: FontSizes.sm, color: Colors.textMuted, marginTop: 4 },
+  goalBadgeText: { fontSize: 9, fontWeight: '800', color: Colors.gold, letterSpacing: 0.8 },
+  targetValue: { fontSize: 48, fontWeight: '900', color: Colors.gold, lineHeight: 54 },
+  targetUnit: { fontSize: FontSizes.lg, fontWeight: '400', color: Colors.textSecondary },
+  offsetNote: { fontSize: FontSizes.xs, color: Colors.textMuted, marginTop: 4 },
 
   sectionTitle: {
-    fontSize: FontSizes.sm, fontWeight: '700', color: Colors.textSecondary,
-    textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10,
+    fontSize: 10, fontWeight: '700', color: Colors.textSecondary,
+    textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 10,
   },
   macroRow: { flexDirection: 'row', gap: 10, marginBottom: Spacing.xl },
   macroCard: {
     flex: 1, backgroundColor: Colors.bgCard, borderRadius: Radii.md,
     padding: Spacing.md, alignItems: 'center', borderWidth: 1, borderColor: Colors.border,
   },
-  macroIcon: { fontSize: 22, marginBottom: 6 },
-  macroValue: { fontSize: FontSizes.xl, fontWeight: '800' },
-  macroLabel: { fontSize: FontSizes.xs, color: Colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2 },
-  macroPct: { fontSize: FontSizes.xs, color: Colors.textMuted, marginTop: 4 },
+  macroIconContainer: {
+    width: 28, height: 28, borderRadius: 14,
+    backgroundColor: Colors.bgElevated, alignItems: 'center', justifyContent: 'center',
+    marginBottom: 6,
+  },
+  macroValue: { fontSize: FontSizes.md, fontWeight: '800' },
+  macroLabel: { fontSize: 9, color: Colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2 },
+  macroPct: { fontSize: 10, color: Colors.textMuted, marginTop: 4 },
 
   ctaBtn: {
-    paddingVertical: 18, borderRadius: Radii.full,
-    alignItems: 'center',
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: Colors.gold, paddingVertical: 16,
+    borderRadius: Radii.full, gap: 8, ...Shadows.gold,
   },
-  ctaBtnText: { fontSize: FontSizes.xl, fontWeight: '900', color: Colors.bg },
+  ctaBtnText: { fontSize: FontSizes.sm, fontWeight: '800', color: Colors.bg, letterSpacing: 0.5 },
 });

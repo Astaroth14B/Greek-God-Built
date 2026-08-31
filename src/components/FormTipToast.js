@@ -10,7 +10,6 @@ import { Ionicons } from '@expo/vector-icons';
 const FormTipToast = ({ tip, visible, onHide, duration = 3500 }) => {
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(20)).current;
-  // Keep a stable ref to onHide so we never need it in the dep array
   const onHideRef = useRef(onHide);
   useEffect(() => { onHideRef.current = onHide; }, [onHide]);
 
@@ -30,8 +29,6 @@ const FormTipToast = ({ tip, visible, onHide, duration = 3500 }) => {
 
       return () => clearTimeout(timer);
     }
-  // opacity and translateY are stable Animated.Values (from useRef), so safe to omit
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, duration]);
 
   if (!visible) return null;
@@ -39,10 +36,10 @@ const FormTipToast = ({ tip, visible, onHide, duration = 3500 }) => {
   return (
     <Animated.View style={[styles.toast, { opacity, transform: [{ translateY }] }]}>
       <View style={styles.iconContainer}>
-        <Ionicons name="bulb" size={18} color={Colors.accent} />
+        <Ionicons name="sparkles" size={16} color={Colors.gold} />
       </View>
       <View style={styles.textContainer}>
-        <Text style={styles.label}>FORM TIP</Text>
+        <Text style={styles.label}>AI FORM TIP</Text>
         <Text style={styles.tip}>{tip}</Text>
       </View>
     </Animated.View>
@@ -55,42 +52,44 @@ const styles = StyleSheet.create({
     bottom: 140,
     left: 20,
     right: 20,
-    backgroundColor: 'rgba(18, 18, 26, 0.95)',
+    backgroundColor: 'rgba(19, 19, 24, 0.95)',
     borderRadius: Radii.md,
     padding: Spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: Colors.borderAccent,
-    shadowColor: Colors.accent,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 10,
+    borderColor: Colors.borderGold,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 8,
   },
   iconContainer: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: Colors.accentGlow,
+    backgroundColor: Colors.goldGlow,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
+    borderWidth: 1,
+    borderColor: Colors.borderGold,
   },
   textContainer: {
     flex: 1,
   },
   label: {
     fontSize: FontSizes.xs,
-    fontWeight: '700',
-    color: Colors.accent,
-    letterSpacing: 1.5,
+    fontWeight: '800',
+    color: Colors.gold,
+    letterSpacing: 1.2,
     marginBottom: 2,
   },
   tip: {
-    fontSize: FontSizes.md,
+    fontSize: FontSizes.sm,
     color: Colors.textPrimary,
-    fontWeight: '500',
+    fontWeight: '600',
   },
 });
 

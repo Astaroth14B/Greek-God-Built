@@ -3,9 +3,9 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Colors, FontSizes, Radii } from '../theme';
 
 /**
- * Horizontal progress bar for a single macro nutrient
+ * Minimalist horizontal progress bar for macro nutrients
  */
-const MacroBar = ({ label, consumed, target, color, unit = 'g' }) => {
+const MacroBar = ({ label, consumed, target, color = Colors.gold, unit = 'g' }) => {
   const progress = target > 0 ? Math.min(consumed / target, 1) : 0;
   const percentage = Math.round(progress * 100);
 
@@ -36,7 +36,7 @@ const MacroBar = ({ label, consumed, target, color, unit = 'g' }) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 12,
+    marginBottom: 14,
   },
   header: {
     flexDirection: 'row',
@@ -45,11 +45,11 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   label: {
-    fontSize: FontSizes.sm,
-    fontWeight: '600',
+    fontSize: FontSizes.xs,
+    fontWeight: '700',
     color: Colors.textSecondary,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
   },
   values: {
     fontSize: FontSizes.sm,
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
   },
   trackBackground: {
-    height: 8,
+    height: 6,
     backgroundColor: Colors.bgElevated,
     borderRadius: Radii.full,
     overflow: 'hidden',

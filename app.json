@@ -1,22 +1,22 @@
 {
   "expo": {
-    "name": "Greek God Build",
-    "slug": "greek-god-build",
+    "name": "Project Zeus",
+    "slug": "project-zeus",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "backgroundColor": "#08080C",
+    "backgroundColor": "#0A0A0D",
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSCameraUsageDescription": "Allow Greek God Build to access your camera to scan meals and track workout form.",
-        "NSMotionUsageDescription": "Allow Greek God Build to track your daily steps."
+        "NSCameraUsageDescription": "Allow Project Zeus to access your camera to scan meals and track workout form.",
+        "NSMotionUsageDescription": "Allow Project Zeus to track your daily steps."
       }
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#08080C",
+        "backgroundColor": "#0A0A0D",
         "foregroundImage": "./assets/adaptive-icon.png"
       },
       "permissions": [
@@ -31,7 +31,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow Greek God Build to access your camera to scan meals and track workout form."
+          "cameraPermission": "Allow Project Zeus to access your camera to scan meals and track workout form."
         }
       ],
       "expo-font"
