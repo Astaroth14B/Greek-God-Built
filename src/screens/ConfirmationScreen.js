@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   ScrollView, Animated,
@@ -10,6 +10,7 @@ export default function ConfirmationScreen({ navigation, route }) {
   const { booking, pro } = route.params || {};
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const bookingRef = useMemo(() => `GGB-${Math.random().toString(36).substr(2, 8).toUpperCase()}`, []);
 
   useEffect(() => {
     Animated.parallel([
@@ -78,9 +79,7 @@ export default function ConfirmationScreen({ navigation, route }) {
         {/* Booking ID */}
         <View style={styles.bookingIdRow}>
           <Text style={styles.bookingIdLabel}>Booking Ref</Text>
-          <Text style={styles.bookingIdValue}>
-            GGB-{Math.random().toString(36).substr(2, 8).toUpperCase()}
-          </Text>
+          <Text style={styles.bookingIdValue}>{bookingRef}</Text>
         </View>
       </View>
 

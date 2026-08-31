@@ -58,12 +58,21 @@ export default function FoodCameraScreen({ navigation }) {
     setCaptured(true);
     setAnalyzing(true);
 
-    // MOCK: replace with real model inference - send image to vision API
-    // Simulate 1.5s analysis delay
+    let photoUri = null;
+    try {
+      if (cameraRef.current) {
+        const photo = await cameraRef.current.takePictureAsync({ quality: 0.7 });
+        photoUri = photo?.uri || null;
+      }
+    } catch (e) {
+      // Fallback for emulator / mock environments
+    }
+
+    // Simulate 1.2s analysis delay for Vision AI experience
     setTimeout(() => {
       setAnalyzing(false);
-      navigation.replace('FoodResult');
-    }, 1500);
+      navigation.replace('FoodResult', { photoUri });
+    }, 1200);
   };
 
   const scanLineY = scanLineAnim.interpolate({

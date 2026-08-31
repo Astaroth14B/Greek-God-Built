@@ -11,6 +11,33 @@ import Card from '../components/Card';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Pedometer } from 'expo-sensors';
 
+// ─── QuickAction — defined at module scope so hooks/refs are stable ────────────
+const QuickAction = ({ icon, label, sublabel, color, onPress, iconLib = 'Ionicons' }) => {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const handlePress = () => {
+    Animated.sequence([
+      Animated.timing(scaleAnim, { toValue: 0.94, duration: 80, useNativeDriver: true }),
+      Animated.timing(scaleAnim, { toValue: 1, duration: 80, useNativeDriver: true }),
+    ]).start(() => onPress());
+  };
+  const IconComp = iconLib === 'MaterialCommunityIcons' ? MaterialCommunityIcons : Ionicons;
+  return (
+    <Animated.View style={{ flex: 1, transform: [{ scale: scaleAnim }] }}>
+      <TouchableOpacity
+        style={[styles.quickAction, { borderColor: color + '55', backgroundColor: color + '10' }]}
+        onPress={handlePress}
+        activeOpacity={0.8}
+      >
+        <View style={[styles.qaIcon, { backgroundColor: color + '20', borderColor: color + '60' }]}>
+          <IconComp name={icon} size={22} color={color} />
+        </View>
+        <Text style={[styles.qaLabel, { color }]}>{label}</Text>
+        {sublabel && <Text style={styles.qaSub}>{sublabel}</Text>}
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
+
 export default function HomeScreen({ navigation }) {
   const { profile, nutrition, streak, stepCount, setStepCount, incrementSteps, getConsumed, dailyLog } = useAppStore();
   const consumed = getConsumed();
@@ -28,7 +55,7 @@ export default function HomeScreen({ navigation }) {
         const start = new Date();
         start.setHours(0, 0, 0, 0);
         Pedometer.getStepCountAsync(start, end)
-          .then((res) => setStepCount(res.steps))
+          .then((res) => res && setStepCount(res.steps))
           .catch(() => {});
       } else {
         mockInterval = setInterval(() => {
@@ -46,31 +73,7 @@ export default function HomeScreen({ navigation }) {
 
   const stepProgress = Math.min(stepCount / 10000, 1);
 
-  const QuickAction = ({ icon, label, sublabel, color, onPress, iconLib = 'Ionicons' }) => {
-    const scaleAnim = useRef(new Animated.Value(1)).current;
-    const handlePress = () => {
-      Animated.sequence([
-        Animated.timing(scaleAnim, { toValue: 0.94, duration: 80, useNativeDriver: true }),
-        Animated.timing(scaleAnim, { toValue: 1, duration: 80, useNativeDriver: true }),
-      ]).start(() => onPress());
-    };
-    const IconComp = iconLib === 'MaterialCommunityIcons' ? MaterialCommunityIcons : Ionicons;
-    return (
-      <Animated.View style={{ flex: 1, transform: [{ scale: scaleAnim }] }}>
-        <TouchableOpacity
-          style={[styles.quickAction, { borderColor: color + '55', backgroundColor: color + '10' }]}
-          onPress={handlePress}
-          activeOpacity={0.8}
-        >
-          <View style={[styles.qaIcon, { backgroundColor: color + '20', borderColor: color + '60' }]}>
-            <IconComp name={icon} size={22} color={color} />
-          </View>
-          <Text style={[styles.qaLabel, { color }]}>{label}</Text>
-          {sublabel && <Text style={styles.qaSub}>{sublabel}</Text>}
-        </TouchableOpacity>
-      </Animated.View>
-    );
-  };
+  // QuickAction is now defined at module scope above — do not inline it here
 
   return (
     <Animated.ScrollView

@@ -4,7 +4,7 @@ import {
   Animated,
 } from 'react-native';
 import { Colors, FontSizes, Spacing, Radii, Shadows } from '../theme';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import Card from '../components/Card';
 
 const EXERCISES = [

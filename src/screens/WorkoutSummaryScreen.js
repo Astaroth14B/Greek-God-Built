@@ -88,7 +88,7 @@ export default function WorkoutSummaryScreen({ navigation, route }) {
           <View key={stat.label} style={[styles.statCard, { borderColor: stat.color + '44' }]}>
             <Text style={styles.statIcon}>{stat.icon}</Text>
             <Text style={[styles.statValue, { color: stat.color }]}>
-              {stat.value}{stat.unit ? '' : ''}
+              {stat.value}
             </Text>
             {stat.unit && <Text style={styles.statUnit}>{stat.unit}</Text>}
             <Text style={styles.statLabel}>{stat.label}</Text>

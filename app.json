@@ -8,13 +8,21 @@
     "userInterfaceStyle": "dark",
     "backgroundColor": "#08080C",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Allow Greek God Build to access your camera to scan meals and track workout form.",
+        "NSMotionUsageDescription": "Allow Greek God Build to track your daily steps."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#08080C",
         "foregroundImage": "./assets/adaptive-icon.png"
-      }
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.ACTIVITY_RECOGNITION"
+      ]
     },
     "web": {
       "favicon": "./assets/icon.png"

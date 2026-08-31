@@ -32,7 +32,7 @@ export default function FoodResultScreen({ navigation }) {
       calories: parseInt(editingCals) || food.calories,
     });
     incrementStreak();
-    navigation.navigate('Log');
+    navigation.navigate('LogTab');
   };
 
   const handleRetake = () => {

@@ -9,7 +9,7 @@ import { Colors, FontSizes } from '../theme';
 const CalorieRing = ({ consumed = 0, target = 2000, size = 180, strokeWidth = 14 }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-  const progress = Math.min(consumed / target, 1);
+  const progress = target > 0 ? Math.min(consumed / target, 1) : 0;
   const strokeDashoffset = circumference * (1 - progress);
   const center = size / 2;
 

@@ -84,43 +84,57 @@ function AppNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {/* Onboarding — only shown before setup is complete */}
         {!hasCompletedOnboarding ? (
           <Stack.Screen name="Onboarding" component={OnboardingNavigator} />
-        ) : (
-          <>
-            <Stack.Screen name="Main" component={MainTabs} />
-            <Stack.Screen
-              name="FoodCamera"
-              component={FoodCameraScreen}
-              options={{ presentation: 'fullScreenModal' }}
-            />
-            <Stack.Screen
-              name="FoodResult"
-              component={FoodResultScreen}
-              options={{ presentation: 'card' }}
-            />
-            <Stack.Screen
-              name="WorkoutCamera"
-              component={WorkoutCameraScreen}
-              options={{ presentation: 'fullScreenModal' }}
-            />
-            <Stack.Screen
-              name="WorkoutSummary"
-              component={WorkoutSummaryScreen}
-              options={{ presentation: 'card' }}
-            />
-            <Stack.Screen
-              name="Booking"
-              component={BookingScreen}
-              options={{ presentation: 'card' }}
-            />
-            <Stack.Screen
-              name="Confirmation"
-              component={ConfirmationScreen}
-              options={{ presentation: 'card' }}
-            />
-          </>
-        )}
+        ) : null}
+
+        {/* Main app screens — only shown after onboarding */}
+        {hasCompletedOnboarding ? (
+          <Stack.Screen name="Main" component={MainTabs} />
+        ) : null}
+        {hasCompletedOnboarding ? (
+          <Stack.Screen
+            name="FoodCamera"
+            component={FoodCameraScreen}
+            options={{ presentation: 'fullScreenModal' }}
+          />
+        ) : null}
+        {hasCompletedOnboarding ? (
+          <Stack.Screen
+            name="FoodResult"
+            component={FoodResultScreen}
+            options={{ presentation: 'card' }}
+          />
+        ) : null}
+        {hasCompletedOnboarding ? (
+          <Stack.Screen
+            name="WorkoutCamera"
+            component={WorkoutCameraScreen}
+            options={{ presentation: 'fullScreenModal' }}
+          />
+        ) : null}
+        {hasCompletedOnboarding ? (
+          <Stack.Screen
+            name="WorkoutSummary"
+            component={WorkoutSummaryScreen}
+            options={{ presentation: 'card' }}
+          />
+        ) : null}
+        {hasCompletedOnboarding ? (
+          <Stack.Screen
+            name="Booking"
+            component={BookingScreen}
+            options={{ presentation: 'card' }}
+          />
+        ) : null}
+        {hasCompletedOnboarding ? (
+          <Stack.Screen
+            name="Confirmation"
+            component={ConfirmationScreen}
+            options={{ presentation: 'card' }}
+          />
+        ) : null}
       </Stack.Navigator>
     </NavigationContainer>
   );

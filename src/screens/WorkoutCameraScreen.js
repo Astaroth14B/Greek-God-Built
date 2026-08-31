@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  Dimensions,
+  Dimensions, AppState,
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Colors, FontSizes, Spacing, Radii, Shadows } from '../theme';
@@ -42,10 +42,22 @@ export default function WorkoutCameraScreen({ navigation, route }) {
   const clockTimer = useRef(null);
 
   useEffect(() => {
+    // Pause all timers when app goes to background; resume when foregrounded
+    const appStateSub = AppState.addEventListener('change', (nextState) => {
+      if (nextState !== 'active') {
+        clearInterval(repTimer.current);
+        clearInterval(clockTimer.current);
+        clearTimeout(tipTimer.current);
+      }
+      // Timers are intentionally NOT auto-restarted on resume;
+      // the user can press Start Tracking again if needed.
+    });
+
     return () => {
+      appStateSub.remove();
       clearInterval(repTimer.current);
-      clearInterval(tipTimer.current);
       clearInterval(clockTimer.current);
+      clearTimeout(tipTimer.current);
     };
   }, []);
 
@@ -61,20 +73,29 @@ export default function WorkoutCameraScreen({ navigation, route }) {
       });
     }, 2500);
 
-    // MOCK: show random form tip every 8–12 seconds
-    tipTimer.current = setInterval(() => {
-      const tip = FORM_TIPS[Math.floor(Math.random() * FORM_TIPS.length)];
-      setCurrentTip(tip);
-      setTipVisible(true);
-    }, 8000 + Math.random() * 4000);
+    // Each tip fires after a freshly randomised delay (true random, not fixed)
+    scheduleTip();
 
     // Clock
     clockTimer.current = setInterval(() => setElapsedSecs((s) => s + 1), 1000);
   };
 
+  // Schedules the next random form tip using setTimeout chaining
+  // so each delay is truly random (not the same fixed value repeated).
+  // Defined after startTracking but hoisted fine in JS via function declaration.
+  function scheduleTip() {
+    const delay = 8000 + Math.random() * 4000;
+    tipTimer.current = setTimeout(() => {
+      const tip = FORM_TIPS[Math.floor(Math.random() * FORM_TIPS.length)];
+      setCurrentTip(tip);
+      setTipVisible(true);
+      scheduleTip(); // schedule the next one
+    }, delay);
+  }
+
   const stopTracking = () => {
     clearInterval(repTimer.current);
-    clearInterval(tipTimer.current);
+    clearTimeout(tipTimer.current); // now a timeout, not interval
     clearInterval(clockTimer.current);
     setIsTracking(false);
 
@@ -132,7 +153,7 @@ export default function WorkoutCameraScreen({ navigation, route }) {
             style={styles.closeBtn}
             onPress={() => {
               clearInterval(repTimer.current);
-              clearInterval(tipTimer.current);
+              clearTimeout(tipTimer.current); // changed to timeout
               clearInterval(clockTimer.current);
               navigation.goBack();
             }}

@@ -6,7 +6,7 @@ import { Colors, FontSizes, Radii } from '../theme';
  * Horizontal progress bar for a single macro nutrient
  */
 const MacroBar = ({ label, consumed, target, color, unit = 'g' }) => {
-  const progress = Math.min(consumed / target, 1);
+  const progress = target > 0 ? Math.min(consumed / target, 1) : 0;
   const percentage = Math.round(progress * 100);
 
   return (

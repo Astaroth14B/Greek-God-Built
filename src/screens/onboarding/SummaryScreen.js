@@ -21,12 +21,14 @@ export default function SummaryScreen({ navigation }) {
   const { profile, setNutrition, completeOnboarding } = useAppStore();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  const result = calcNutritionProfile(profile);
+  // Compute once at mount and persist to the store immediately
+  const result = useRef(calcNutritionProfile(profile)).current;
 
   useEffect(() => {
     setNutrition(result);
     Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }).start();
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once — profile is finalized before this screen mounts
 
   const handleStart = () => {
     completeOnboarding();

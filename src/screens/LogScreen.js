@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity,
-  ScrollView, Alert, TextInput, Modal, Animated,
+  ScrollView, Alert, Animated,
 } from 'react-native';
 import { Colors, FontSizes, Spacing, Radii, Shadows } from '../theme';
 import useAppStore from '../store/useAppStore';

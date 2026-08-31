@@ -10,6 +10,9 @@ import { Ionicons } from '@expo/vector-icons';
 const FormTipToast = ({ tip, visible, onHide, duration = 3500 }) => {
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(20)).current;
+  // Keep a stable ref to onHide so we never need it in the dep array
+  const onHideRef = useRef(onHide);
+  useEffect(() => { onHideRef.current = onHide; }, [onHide]);
 
   useEffect(() => {
     if (visible) {
@@ -22,12 +25,14 @@ const FormTipToast = ({ tip, visible, onHide, duration = 3500 }) => {
         Animated.parallel([
           Animated.timing(opacity, { toValue: 0, duration: 300, useNativeDriver: true }),
           Animated.timing(translateY, { toValue: 20, duration: 300, useNativeDriver: true }),
-        ]).start(() => onHide && onHide());
+        ]).start(() => onHideRef.current && onHideRef.current());
       }, duration);
 
       return () => clearTimeout(timer);
     }
-  }, [visible]);
+  // opacity and translateY are stable Animated.Values (from useRef), so safe to omit
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible, duration]);
 
   if (!visible) return null;
 
