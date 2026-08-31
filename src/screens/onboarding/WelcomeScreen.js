@@ -6,7 +6,7 @@ import {
 import { Colors, FontSizes, Spacing, Radii, Shadows } from '../../theme';
 import { Ionicons } from '@expo/vector-icons';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 export default function WelcomeScreen({ navigation }) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -20,14 +20,26 @@ export default function WelcomeScreen({ navigation }) {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={Colors.bg} />
+    <View style={styles.root}>
+      <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+
+      {/* Background Statue (Slightly Darkened) */}
+      <Image
+        source={require('../../../assets/zeus-bg.png')}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      />
+      {/* Dark tint overlay */}
+      <View style={styles.backgroundDarkOverlay} />
+      {/* Bottom fade so CTA area stays readable */}
+      <View style={styles.backgroundBottomFade} />
 
       <Animated.View
         style={[styles.content, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}
       >
-        {/* Project Zeus Logo */}
+        {/* Project Zeus Logo — Popping Out */}
         <View style={styles.logoWrapper}>
+          <View style={styles.logoGlowRing} />
           <View style={styles.logoBorder}>
             <Image
               source={require('../../../assets/logo.png')}
@@ -86,35 +98,64 @@ export default function WelcomeScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  root: {
     flex: 1,
     backgroundColor: Colors.bg,
-    alignItems: 'center',
-    justifyContent: 'center',
+  },
+  backgroundImage: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: width,
+    height: height,
+    opacity: 0.35,
+  },
+  backgroundDarkOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(10, 10, 13, 0.72)',
+  },
+  backgroundBottomFade: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: height * 0.42,
+    backgroundColor: 'rgba(10, 10, 13, 0.88)',
   },
   content: {
+    flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: Spacing.lg,
     width: '100%',
   },
   logoWrapper: {
     marginBottom: Spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoGlowRing: {
+    position: 'absolute',
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: 'rgba(212, 175, 55, 0.2)',
   },
   logoBorder: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#000',
-    borderWidth: 1.5,
-    borderColor: Colors.borderGold,
+    backgroundColor: '#000000',
+    borderWidth: 2,
+    borderColor: Colors.gold,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
     shadowColor: Colors.gold,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.9,
+    shadowRadius: 14,
+    elevation: 14,
   },
   logoImage: {
     width: 114,
@@ -176,7 +217,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
-    backgroundColor: Colors.bgCard,
+    backgroundColor: 'rgba(19, 19, 24, 0.92)',
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: Radii.md,
